@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Gap Calculator</title>
+
+<!-- APP ICON & THEME SETTINGS -->
+<meta name="theme-color" content="#0F0F0F">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="application-name" content="Gap Calc">
+
+<!-- Native App Manifest -->
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Gap%20Calculator%22%2C%22short_name%22%3A%22Gap%20Calc%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230F0F0F%22%2C%22theme_color%22%3A%22%230F0F0F%22%7D">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #0F0F0F;
+  --surface: #1A1A1A;
+  --surface-active: #252525;
+  --primary: #FF9F1C; 
+  --text-main: #FFFFFF;
+  --text-secondary: #A1A1A1;
+  --border: #333333;
+  --success: #4ADE80;
+  --error: #EF4444;
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  background: var(--bg);
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  padding-bottom: 30px;
+}
+
+.container {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+}
+
+.header {
+  margin-bottom: 2px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin: 0;
+  text-transform: uppercase;
+  color: var(--text-main);
+}
+
+.header p {
+  font-size: 12px;
+  color: var(--primary);
+  margin-top: 4px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.input-group { display: flex; flex-direction: column; gap: 6px; }
+
+label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+input {
+  width: 100%;
+  padding: 14px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-main);
+  font-size: 15px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+/* Strict Single Active Input Highlight */
+input.active-input {
+  background: var(--surface-active) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 1px var(--primary) !important;
+}
+
+.segmented-control {
+  background: var(--surface);
+  padding: 4px;
+  border-radius: var(--radius);
+  display: flex;
+  gap: 4px;
+  border: 1px solid var(--border);
+}
+
+.segment-label {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  font-weight: 500;
+  user-select: none;
+}
+
+.segment-label:has(input:checked) {
+  background: var(--surface-active);
+  color: var(--primary);
+  font-weight: 600;
+}
+.segmented-control input { display: none; }
+
+button.calc-btn {
+  width: 100%;
+  padding: 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: #000;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 4px;
+}
+button.calc-btn:active { opacity: 0.9; }
+
+/* MINIMAL OUTPUT PANEL */
+.result-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+}
+.result-panel.visible { display: flex; animation: fadeUp 0.3s ease; }
+
+.primary-card {
+  background: #111111;
+  border: 1px solid #2a2a2a;
+  border-left: 4px solid var(--primary);
+  border-radius: 6px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.primary-card .card-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.primary-card .main-val {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+.unit-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.pill {
+  background: #222222;
+  border: 1px solid #333333;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #dddddd;
+}
+.pill span { color: var(--text-secondary); font-weight: 500; }
+
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.stat-box {
+  background: #141414;
+  border: 1px solid #262626;
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; }
+.stat-val { font-size: 14px; color: var(--text-main); font-weight: 600; }
+
+/* DIFFERENCE CARD */
+.diff-card {
+  background: #141414;
+  border: 1px solid #262626;
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.diff-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.diff-title {
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.diff-main-val {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.status-badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; display: inline-block; }
+.status-success { background: rgba(74, 222, 128, 0.1); color: var(--success); }
+.status-warn { background: rgba(250, 204, 21, 0.1); color: #FACC15; }
+
+/* DYNAMIC SCROLL SPACER */
+#kbScrollSpacer {
+  height: 0px;
+  transition: height 0.25s ease;
+  width: 100%;
+}
+
+/* CUSTOM VIRTUAL KEYBOARD STYLES */
+.kb-overlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #121212;
+  border-top: 1px solid #2e2e2e;
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.9);
+  padding: 8px 10px 12px;
+  z-index: 1000;
+  transform: translateY(100%);
+  transition: transform 0.22s cubic-bezier(0.1, 0.9, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-width: 440px;
+  margin: 0 auto;
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+}
+
+.kb-overlay.active {
+  transform: translateY(0);
+}
+
+.kb-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #222;
+}
+
+.kb-title {
+  font-size: 10px;
+  color: var(--primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.kb-badge {
+  font-size: 10px;
+  color: var(--text-secondary);
+  background: #1e1e1e;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.kb-section-title {
+  font-size: 9px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-top: 1px;
+}
+
+.frac-grid-7 {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.frac-grid-8 {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+}
+
+.numpad-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.kb-btn {
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 9px 0;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  transition: background 0.1s, transform 0.05s, border-color 0.1s;
+}
+
+.kb-btn:active {
+  background: var(--surface-active);
+  border-color: var(--primary);
+  transform: scale(0.95);
+}
+
+.kb-btn.frac-btn {
+  background: rgba(255, 159, 28, 0.12);
+  color: var(--primary);
+  border-color: rgba(255, 159, 28, 0.35);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 0;
+}
+
+.kb-btn.frac-16 {
+  font-size: 11px;
+  padding: 7px 0;
+}
+
+.kb-btn.accent {
+  background: rgba(255, 159, 28, 0.2);
+  color: var(--primary);
+  border-color: rgba(255, 159, 28, 0.5);
+  font-weight: 700;
+}
+
+.kb-btn.action {
+  background: #222222;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.kb-nav-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.kb-btn.done-btn {
+  background: var(--primary);
+  color: #000;
+  font-weight: 700;
+  border: none;
+}
+
+.hidden { display: none; }
+.footer { margin-top: auto; text-align: center; font-size: 10px; color: #444; font-weight: 500; padding-bottom: 10px; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+
+<body>
+<div class="container">
+  <div class="header">
+    <h1>GAP CALCULATOR</h1>
+    <p>By Tajmul</p>
+  </div>
+
+  <!-- UNIT SYSTEM SELECTOR -->
+  <div class="input-group">
+    <label>Unit System</label>
+    <div class="segmented-control">
+      <label class="segment-label">
+        <input type="radio" name="unit" value="inch" checked onchange="toggleUnits()">
+        Inch / Null
+      </label>
+      <label class="segment-label">
+        <input type="radio" name="unit" value="mm" onchange="toggleUnits()">
+        Millimeter (MM)
+      </label>
+    </div>
+  </div>
+
+  <div class="input-group">
+    <label id="lbl-frame">Total Span (Inside Dimension)</label>
+    <input id="frame" type="text" placeholder='e.g. 44" or 44 ¾' readonly>
+  </div>
+
+  <div class="input-group">
+    <label id="lbl-bar">Material O.D. / Width</label>
+    <input id="bar" type="text" placeholder='e.g. 4 null or 3/4"' readonly>
+  </div>
+
+  <div class="input-group" style="margin-top:4px;">
+    <label>Calculation Method</label>
+    <div class="segmented-control">
+      <label class="segment-label">
+        <input type="radio" name="mode" value="gap" checked onchange="toggleInputs()">
+        Optimize Gap
+      </label>
+      <label class="segment-label">
+        <input type="radio" name="mode" value="pipe" onchange="toggleInputs()">
+        Fixed Quantity
+      </label>
+    </div>
+  </div>
+
+  <div id="gapInputs" class="grid-2">
+    <div class="input-group">
+      <label id="lbl-gapStart">Min Gap</label>
+      <input id="gapStart" type="text" placeholder='e.g. 3"' readonly>
+    </div>
+    <div class="input-group">
+      <label id="lbl-gapMax">Max Gap</label>
+      <input id="gapMax" type="text" placeholder='e.g. 4 ¾"' readonly>
+    </div>
+  </div>
+
+  <div id="pipeInputs" class="input-group hidden">
+    <label>Quantity Required</label>
+    <input id="pipeCount" type="text" placeholder="10" readonly>
+  </div>
+
+  <button class="calc-btn" onclick="calculate()">Calculate</button>
+
+  <div id="outputPanel" class="result-panel">
+    <div id="outputContent"></div>
+  </div>
+
+  <!-- DYNAMIC VIEWPORT SCROLL SPACER -->
+  <div id="kbScrollSpacer"></div>
+
+  <div class="footer">© Gap Calculator By Tajmul</div>
+</div>
+
+<!-- CUSTOM INCH & FRACTION KEYBOARD -->
+<div id="customKb" class="kb-overlay">
+  <div class="kb-bar">
+    <span id="kbTargetTitle" class="kb-title">EDITING INPUT</span>
+    <span id="kbUnitBadge" class="kb-badge">INCH MODE</span>
+  </div>
+  
+  <div id="kbGridContainer">
+    <!-- Dynamic Fraction and Numpad Keys render here -->
+  </div>
+
+  <div class="kb-nav-row">
+    <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="navField(-1)">◄ Prev</button>
+    <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="navField(1)">Next ►</button>
+    <button class="kb-btn done-btn" onpointerdown="preventBlur(event)" onclick="closeKeyboard(true)">Done ✓</button>
+  </div>
+</div>
+
+<script>
+const NULL = 1/8, HALF_NULL = NULL / 2;
+const MM_TO_INCH = 1 / 25.4;
+let activeInput = null;
+
+function replaceUnicodeFractions(s) {
+  const fracMap = {
+    '½': ' 1/2', '¼': ' 1/4', '¾': ' 3/4',
+    '⅛': ' 1/8', '⅜': ' 3/8', '⅝': ' 5/8', '⅞': ' 7/8',
+    '⅓': ' 1/3', '⅔': ' 2/3'
+  };
+  return s.replace(/[½¼¾⅛⅜⅝⅞⅓⅔]/g, m => fracMap[m] || m);
+}
+
+function evalSegment(str) {
+  str = str.trim();
+  if (!str) return 0;
+  let parts = str.split(/\s+/);
+  let total = 0;
+  for (let p of parts) {
+    if (p.includes('/')) {
+      let [num, den] = p.split('/');
+      let n = parseFloat(num), d = parseFloat(den);
+      if (!isNaN(n) && !isNaN(d) && d !== 0) total += n / d;
+    } else {
+      let n = parseFloat(p);
+      if (!isNaN(n)) total += n;
+    }
+  }
+  return total;
+}
+
+function parseMeasurement(input, unitMode) {
+  if (input === null || input === undefined) return NaN;
+  let s = input.toString().trim();
+  if (!s) return NaN;
+
+  s = replaceUnicodeFractions(s).toLowerCase();
+
+  if (s.includes('mm')) {
+    let numStr = s.replace(/mm/g, '').trim();
+    let mmVal = evalSegment(numStr);
+    return isNaN(mmVal) ? NaN : mmVal * MM_TO_INCH;
+  }
+
+  let hasInchKeyword = s.includes('"') || s.includes('inch') || s.includes('in');
+  let hasNullKeyword = s.includes('null');
+
+  if (unitMode === 'mm' && !hasInchKeyword && !hasNullKeyword) {
+    let mmVal = evalSegment(s);
+    return isNaN(mmVal) ? NaN : mmVal * MM_TO_INCH;
+  }
+
+  let totalInches = 0;
+  let parsedAny = false;
+
+  if (hasInchKeyword || hasNullKeyword) {
+    let inchMatch = s.match(/(.*?)(?:"|inch|in\b)/);
+    if (inchMatch) {
+      let inchVal = evalSegment(inchMatch[1]);
+      totalInches += inchVal;
+      parsedAny = true;
+      s = s.replace(inchMatch[0], '');
+    }
+
+    let nullMatch = s.match(/(.*?)null/);
+    if (nullMatch) {
+      let nullVal = evalSegment(nullMatch[1]);
+      totalInches += nullVal * NULL;
+      parsedAny = true;
+    }
+
+    if (parsedAny) return totalInches;
+  }
+
+  let val = evalSegment(s);
+  return isNaN(val) ? NaN : val;
+}
+
+function toInchNull(x) {
+  if (Math.abs(x) < 0.0001) return '0"';
+  let inch = Math.floor(x);
+  let remNull = (x - inch) * 8;
+  remNull = Math.round(remNull * 100) / 100;
+  let remNullStr = Number(remNull.toFixed(2)).toString();
+
+  if (inch > 0 && remNull > 0) {
+    return `${inch}" ${remNullStr} null`;
+  } else if (inch > 0) {
+    return `${inch}"`;
+  } else {
+    return `${remNullStr} null`;
+  }
+}
+
+function toFractionalInch(x) {
+  if (Math.abs(x) < 0.0001) return '0"';
+  let total16ths = Math.round(x * 16);
+  let inches = Math.floor(total16ths / 16);
+  let rem16ths = total16ths % 16;
+
+  if (rem16ths === 0) return `${inches}"`;
+
+  let num = rem16ths, den = 16;
+  function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+  let g = gcd(num, den);
+  num /= g;
+  den /= g;
+
+  let fracStr = `${num}/${den}`;
+  const unicodeMap = {
+    '1/2': '½', '1/4': '¼', '3/4': '¾',
+    '1/8': '⅛', '3/8': '⅜', '5/8': '⅝', '7/8': '⅞'
+  };
+
+  let displayFrac = unicodeMap[fracStr] || fracStr;
+  return inches > 0 ? `${inches} ${displayFrac}"` : `${displayFrac}"`;
+}
+
+function toMM(x) {
+  let mm = x * 25.4;
+  return (Math.round(mm * 10) / 10) + ' mm';
+}
+
+function gapPriority(f, b, gs, gm, unitMode) {
+  let best = null, d = 1e9;
+  let step = (unitMode === 'mm') ? (0.5 * MM_TO_INCH) : HALF_NULL;
+
+  for (let g = gs; g <= gm + 0.0001; g += step) {
+    let n = Math.floor((f - g) / (b + g));
+    if (n > 0) {
+      let u = n * b + (n + 1) * g;
+      let diff = Math.abs(f - u);
+      if (diff < d) {
+        d = diff;
+        best = { n, g, diff, calculatedTotal: u };
+      }
+      if (diff < 0.0001) return { ...best, exact: true };
+    }
+  }
+  if (best) return { ...best, exact: false };
+  return null;
+}
+
+function pipePriority(f, b, n) {
+  let g = (f - n * b) / (n + 1);
+  return g < 0 ? null : { g, calculatedTotal: n * b + (n + 1) * g };
+}
+
+function getSelectedUnit() {
+  return document.querySelector("input[name=unit]:checked").value;
+}
+
+function toggleUnits() {
+  const unitMode = getSelectedUnit();
+  const f = document.getElementById("frame");
+  const b = document.getElementById("bar");
+  const gs = document.getElementById("gapStart");
+  const gm = document.getElementById("gapMax");
+
+  if (unitMode === "mm") {
+    f.placeholder = 'e.g. 1100 mm';
+    b.placeholder = 'e.g. 50 mm';
+    gs.placeholder = 'e.g. 75 mm';
+    gm.placeholder = 'e.g. 100 mm';
+  } else {
+    f.placeholder = 'e.g. 44" or 44 ¾';
+    b.placeholder = 'e.g. 4 null or 3/4"';
+    gs.placeholder = 'e.g. 3"';
+    gm.placeholder = 'e.g. 4 ¾"';
+  }
+
+  if (activeInput) {
+    renderKeyboardKeys();
+  }
+
+  if (document.getElementById("outputPanel").classList.contains("visible")) {
+    calculate();
+  }
+}
+
+function toggleInputs() {
+  const mode = document.querySelector("input[name=mode]:checked").value;
+  const gapGroup = document.getElementById("gapInputs");
+  const pipeGroup = document.getElementById("pipeInputs");
+  
+  if (mode === "gap") {
+    gapGroup.classList.remove("hidden");
+    pipeGroup.classList.add("hidden");
+  } else {
+    gapGroup.classList.add("hidden");
+    pipeGroup.classList.remove("hidden");
+  }
+  document.getElementById("outputPanel").classList.remove("visible");
+}
+
+function calculate() {
+  const panel = document.getElementById("outputPanel");
+  const content = document.getElementById("outputContent");
+  const unitMode = getSelectedUnit();
+
+  try {
+    let f = parseMeasurement(document.getElementById("frame").value, unitMode);
+    let b = parseMeasurement(document.getElementById("bar").value, unitMode);
+    let m = document.querySelector("input[name=mode]:checked").value;
+
+    if (isNaN(f) || isNaN(b) || f <= 0 || b <= 0) throw "Invalid";
+
+    let html = "";
+    let res = null;
+
+    if (m === "gap") {
+      let gs = parseMeasurement(document.getElementById("gapStart").value, unitMode);
+      let gm = parseMeasurement(document.getElementById("gapMax").value, unitMode);
+      if (isNaN(gs) || isNaN(gm)) throw "Invalid";
+
+      res = gapPriority(f, b, gs, gm, unitMode);
+      if (!res) {
+        content.innerHTML = `<div style="text-align:center; color:var(--error); padding: 8px 0;">No practical gap found in range.</div>`;
+        panel.classList.add("visible");
+        return;
+      }
+    } else {
+      let pc = parseInt(document.getElementById("pipeCount").value);
+      if (isNaN(pc) || pc <= 0) throw "Invalid";
+      let pRes = pipePriority(f, b, pc);
+      if (!pRes) {
+        content.innerHTML = `<div style="text-align:center; color:var(--error); padding: 8px 0;">Material quantity exceeds total span.</div>`;
+        panel.classList.add("visible");
+        return;
+      }
+      res = { n: pc, g: pRes.g, exact: true, diff: 0, calculatedTotal: pRes.calculatedTotal };
+    }
+
+    let primaryGapStr = unitMode === 'mm' ? toMM(res.g) : toFractionalInch(res.g);
+
+    html = `
+      <!-- PRIMARY GAP HIGHLIGHT CARD -->
+      <div class="primary-card">
+        <div class="card-title">Required Gap Spacing</div>
+        <div class="main-val">${primaryGapStr}</div>
+        <div class="unit-pills">
+          <div class="pill"><span>Frac:</span> ${toFractionalInch(res.g)}</div>
+          <div class="pill"><span>Null:</span> ${toInchNull(res.g)}</div>
+          <div class="pill"><span>MM:</span> ${toMM(res.g)}</div>
+        </div>
+      </div>
+
+      <!-- KEY STATS GRID -->
+      <div class="result-grid">
+        <div class="stat-box">
+          <div class="stat-label">Material Qty</div>
+          <div class="stat-val">${res.n} Units</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Fit Status</div>
+          <div>
+            <span class="status-badge ${res.exact ? 'status-success' : 'status-warn'}">
+              ${res.exact ? 'Perfect Fit' : 'Nearest Approx'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DIFFERENCE SECTION WITH FRAC, NULL & MM -->
+      <div class="diff-card">
+        <div class="diff-header">
+          <span class="diff-title">Difference</span>
+          <span class="diff-main-val" style="color: ${res.exact ? 'var(--text-main)' : '#FACC15'};">
+            ${res.exact ? '0' : (unitMode === 'mm' ? toMM(res.diff) : toFractionalInch(res.diff))}
+          </span>
+        </div>
+        ${!res.exact ? `
+          <div class="unit-pills">
+            <div class="pill"><span>Frac:</span> ${toFractionalInch(res.diff)}</div>
+            <div class="pill"><span>Null:</span> ${toInchNull(res.diff)}</div>
+            <div class="pill"><span>MM:</span> ${toMM(res.diff)}</div>
+          </div>
+        ` : ''}
+      </div>
+    `;
+
+    content.innerHTML = html;
+    panel.classList.add("visible");
+
+  } catch(e) {
+    content.innerHTML = `<div style="text-align:center; color:var(--error); padding: 8px 0;">⚠ Please check input measurements</div>`;
+    panel.classList.add("visible");
+  }
+}
+
+// --- CUSTOM VIRTUAL INCH & FRACTION KEYBOARD ENGINE ---
+
+function preventBlur(e) {
+  e.preventDefault();
+}
+
+function setupInputs() {
+  const inputs = document.querySelectorAll('.container input[type="text"], .container input[type="number"]');
+  inputs.forEach(input => {
+    input.addEventListener('pointerdown', () => openKeyboard(input));
+    input.addEventListener('click', () => openKeyboard(input));
+  });
+
+  document.addEventListener('pointerdown', (e) => {
+    const kb = document.getElementById('customKb');
+    if (!kb.contains(e.target) && !e.target.matches('input') && !e.target.matches('.segment-label')) {
+      closeKeyboard(false);
+    }
+  });
+}
+
+function scrollToActiveInput(inputElem) {
+  if (!inputElem) return;
+  setTimeout(() => {
+    const kb = document.getElementById('customKb');
+    if (!kb) return;
+    
+    const kbHeight = kb.offsetHeight || 370;
+    const spacer = document.getElementById('kbScrollSpacer');
+    if (spacer) spacer.style.height = (kbHeight + 40) + 'px';
+
+    const kbTop = window.innerHeight - kbHeight;
+    const inputRect = inputElem.getBoundingClientRect();
+    const desiredInputBottom = kbTop - 18;
+    const scrollOffset = inputRect.bottom - desiredInputBottom;
+
+    window.scrollBy({
+      top: scrollOffset,
+      behavior: 'smooth'
+    });
+  }, 60);
+}
+
+function openKeyboard(inputElem) {
+  if (!inputElem) return;
+
+  document.querySelectorAll('.container input').forEach(i => {
+    i.classList.remove('active-input');
+  });
+
+  activeInput = inputElem;
+  activeInput.classList.add('active-input');
+
+  const unitMode = getSelectedUnit();
+  const labelObj = document.querySelector(`label[for="${inputElem.id}"]`) || 
+                   inputElem.previousElementSibling || 
+                   inputElem.parentElement.querySelector('label');
+                   
+  const titleText = labelObj ? labelObj.innerText : "EDITING INPUT";
+  
+  document.getElementById('kbTargetTitle').innerText = titleText;
+  document.getElementById('kbUnitBadge').innerText = unitMode === 'mm' ? 'MM MODE' : 'INCH MODE';
+  
+  renderKeyboardKeys();
+  document.getElementById('customKb').classList.add('active');
+
+  scrollToActiveInput(inputElem);
+}
+
+function closeKeyboard(shouldCalculate = false) {
+  document.getElementById('customKb').classList.remove('active');
+  const spacer = document.getElementById('kbScrollSpacer');
+  if (spacer) spacer.style.height = '0px';
+
+  document.querySelectorAll('.container input').forEach(i => {
+    i.classList.remove('active-input');
+  });
+  activeInput = null;
+  if (shouldCalculate) {
+    calculate();
+  }
+}
+
+function isFractionKey(k) {
+  return ['⅛', '¼', '⅜', '½', '⅝', '¾', '⅞', '1/16', '3/16', '5/16', '7/16', '9/16', '11/16', '13/16', '15/16'].includes(k);
+}
+
+function renderKeyboardKeys() {
+  const unitMode = getSelectedUnit();
+  const container = document.getElementById('kbGridContainer');
+  
+  if (unitMode === 'inch') {
+    container.innerHTML = `
+      <div class="kb-section-title">Eighths & Quarters (In Order)</div>
+      <div class="frac-grid-7">
+        <button class="kb-btn frac-btn" onpointerdown="preventBlur(event)" onclick="handleKey('⅛')">⅛</button>
+        <button class="kb-btn frac-btn" onpointerdown="preventBlur(event)" onclick="handleKey('¼')">¼</button>
+        <button class="kb-btn frac-btn" onpointerdown="preventBlur(event)" onclick="handleKey('⅜')">⅜</button>
+        <button class="kb-btn frac-btn" onpointerdown="preventBlur(event)" onclick="handleKey('½')">½</button>
+        <button class="kb-btn frac-btn" onpointerdown="preventBlur(event)" onclick="handleKey('⅝')">⅝</button>
+        <button class="kb-btn frac-btn" onpointerdown="preventBlur(event)" onclick="handleKey('¾')">¾</button>
+        <button class="kb-btn frac-btn" onpointerdown="preventBlur(event)" onclick="handleKey('⅞')">⅞</button>
+      </div>
+
+      <div class="kb-section-title">Sixteenths (16ths)</div>
+      <div class="frac-grid-8">
+        <button class="kb-btn frac-btn frac-16" onpointerdown="preventBlur(event)" onclick="handleKey('1/16')">1/16</button>
+        <button class="kb-btn frac-btn frac-16" onpointerdown="preventBlur(event)" onclick="handleKey('3/16')">3/16</button>
+        <button class="kb-btn frac-btn frac-16" onpointerdown="preventBlur(event)" onclick="handleKey('5/16')">5/16</button>
+        <button class="kb-btn frac-btn frac-16" onpointerdown="preventBlur(event)" onclick="handleKey('7/16')">7/16</button>
+        <button class="kb-btn frac-btn frac-16" onpointerdown="preventBlur(event)" onclick="handleKey('9/16')">9/16</button>
+        <button class="kb-btn frac-btn frac-16" onpointerdown="preventBlur(event)" onclick="handleKey('11/16')">11/16</button>
+        <button class="kb-btn frac-btn frac-16" onpointerdown="preventBlur(event)" onclick="handleKey('13/16')">13/16</button>
+        <button class="kb-btn frac-btn frac-16" onpointerdown="preventBlur(event)" onclick="handleKey('15/16')">15/16</button>
+      </div>
+
+      <div class="numpad-grid" style="margin-top:4px;">
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('7')">7</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('8')">8</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('9')">9</button>
+        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('&quot;')">"</button>
+        <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="handleKey('BACK')">⌫</button>
+
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('4')">4</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('5')">5</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('6')">6</button>
+        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('null')">null</button>
+        <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="handleKey('CLEAR')">CLR</button>
+
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('1')">1</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('2')">2</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('3')">3</button>
+        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('/')">/</button>
+        <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="handleKey(' ')">Space</button>
+
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('0')">0</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('.')">.</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('0.5')">0.5</button>
+        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('mm')">mm</button>
+        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('00')">00</button>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div class="numpad-grid" style="margin-top:4px;">
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('7')">7</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('8')">8</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('9')">9</button>
+        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('00')">00</button>
+        <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="handleKey('BACK')">⌫</button>
+
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('4')">4</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('5')">5</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('6')">6</button>
+        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('.5')">.5</button>
+        <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="handleKey('CLEAR')">CLR</button>
+
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('1')">1</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('2')">2</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('3')">3</button>
+        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('mm')">mm</button>
+        <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="handleKey(' ')">Space</button>
+
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('0')">0</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('.')">.</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('.25')">.25</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('.75')">.75</button>
+        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('&quot;')">"</button>
+      </div>
+    `;
+  }
+}
+
+function handleKey(key) {
+  if (!activeInput) return;
+  
+  let val = activeInput.value;
+  let start = activeInput.selectionStart !== null ? activeInput.selectionStart : val.length;
+  let end = activeInput.selectionEnd !== null ? activeInput.selectionEnd : val.length;
+
+  if (key === 'BACK') {
+    if (start === end) {
+      if (start > 0) {
+        activeInput.value = val.slice(0, start - 1) + val.slice(start);
+        let newPos = start - 1;
+        try { activeInput.setSelectionRange(newPos, newPos); } catch(e){}
+      }
+    } else {
+      activeInput.value = val.slice(0, start) + val.slice(end);
+      try { activeInput.setSelectionRange(start, start); } catch(e){}
+    }
+  } else if (key === 'CLEAR') {
+    activeInput.value = '';
+    try { activeInput.setSelectionRange(0, 0); } catch(e){}
+  } else {
+    let insertStr = key;
+    
+    if ((key === 'null' || key === 'mm') && start > 0 && val.charAt(start - 1) !== ' ') {
+      insertStr = ' ' + key;
+    } else if (isFractionKey(key) && start > 0 && /\d/.test(val.charAt(start - 1))) {
+      insertStr = ' ' + key;
+    }
+
+    activeInput.value = val.slice(0, start) + insertStr + val.slice(end);
+    let newPos = start + insertStr.length;
+    try { activeInput.setSelectionRange(newPos, newPos); } catch(e){}
+  }
+
+  activeInput.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function navField(dir) {
+  const visibleInputs = Array.from(document.querySelectorAll('.container input[type="text"], .container input[type="number"]'))
+    .filter(input => input.offsetParent !== null);
+    
+  if (visibleInputs.length === 0) return;
+
+  let idx = activeInput ? visibleInputs.indexOf(activeInput) : -1;
+  let nextIdx = idx + dir;
+
+  if (nextIdx < 0) nextIdx = visibleInputs.length - 1;
+  if (nextIdx >= visibleInputs.length) nextIdx = 0;
+
+  openKeyboard(visibleInputs[nextIdx]);
+}
+
+window.onload = function() {
+  toggleInputs();
+  setupInputs();
+};
+</script>
+</body>
+</html>
