@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "439910594124",
+    "project_id": "gap-calculator-tajmul",
+    "storage_bucket": "gap-calculator-tajmul.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:439910594124:android:4ec7448007a6903b6ae6e9",
+        "android_client_info": {
+          "package_name": "com.tajmul.gapcalculator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAq2WDmNb0S5JkD_jooLrUb4zkQ3QMYjZ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
