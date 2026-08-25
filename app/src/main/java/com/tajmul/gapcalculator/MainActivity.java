@@ -5,14 +5,22 @@ import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+// AdMob Imports
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
+import com.google.android.gms.ads.FullScreenContentCallback;
 
 public class MainActivity extends AppCompatActivity {
     
     private AdView adView;
+    private InterstitialAd mInterstitialAd;
     
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -20,18 +28,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Ads ko background mein start karo taaki app jaldi khule
+        // Start Ads in the background
         new Thread(() -> {
             MobileAds.initialize(this, initializationStatus -> {});
             runOnUiThread(() -> {
+                // 1. Load the Banner Ad at the bottom
                 adView = findViewById(R.id.adView);
                 if (adView != null) {
                     adView.loadAd(new AdRequest.Builder().build());
                 }
+
+                // 2. Load and Show the Full-Screen Ad
+                loadFullScreenAd();
             });
         }).start();
 
-        // WebView setup (Tumhara calculator)
+        // Setup the Calculator Web Interface
         WebView webView = findViewById(R.id.webView);
         WebSettings ws = webView.getSettings();
         ws.setJavaScriptEnabled(true);
@@ -39,6 +51,36 @@ public class MainActivity extends AppCompatActivity {
         ws.setAllowFileAccess(true);
         webView.setWebViewClient(new WebViewClient());
         webView.loadUrl("file:///android_asset/index.html");
+    }
+
+    private void loadFullScreenAd() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        
+        // This is Google's official Test ID for Full-Screen (Interstitial) Ads
+        InterstitialAd.load(this, "ca-app-pub-3940256099942544/1033173712", adRequest,
+            new InterstitialAdLoadCallback() {
+                @Override
+                public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                    mInterstitialAd = interstitialAd;
+                    
+                    // Show the ad instantly as soon as it is ready
+                    mInterstitialAd.show(MainActivity.this);
+                    
+                    mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback(){
+                        @Override
+                        public void onAdDismissedFullScreenContent() {
+                            // This runs when the user hits the "X" to close the ad
+                            mInterstitialAd = null;
+                        }
+                    });
+                }
+
+                @Override
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                    // If ad fails to load (e.g., no internet), it just skips quietly
+                    mInterstitialAd = null;
+                }
+            });
     }
     
     @Override 
