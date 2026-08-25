@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity {
     private void loadFullScreenAd() {
         AdRequest adRequest = new AdRequest.Builder().build();
         
-        // This is Google's official Test ID for Full-Screen (Interstitial) Ads
-        InterstitialAd.load(this, "ca-app-pub-3940256099942544/1033173712", adRequest,
+        // This is your LIVE AdMob Interstitial ID
+        InterstitialAd.load(this, "ca-app-pub-4812493783151469/2570826540", adRequest,
             new InterstitialAdLoadCallback() {
                 @Override
                 public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
