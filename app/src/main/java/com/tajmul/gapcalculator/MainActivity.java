@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 // 2. Load and Show the Full-Screen Ad
-                loadFullScreenAd();
+            
             });
         }).start();
 
