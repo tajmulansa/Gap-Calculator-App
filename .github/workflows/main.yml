@@ -22,7 +22,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: '8.2'
+          gradle-version: '8.9'
 
       - name: Clean and Build Release Bundle (.aab)
         run: gradle clean bundleRelease
@@ -42,4 +42,3 @@ jobs:
         with:
           name: GapCalculator-PlayStore-Ready
           path: ${{steps.sign_app.outputs.signedReleaseFile}}
-          
