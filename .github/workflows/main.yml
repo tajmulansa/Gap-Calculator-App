@@ -22,13 +22,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Fix Gradle Permissions
-        run: |
-          sed -i 's/\r$//' ./gradlew
-          chmod +x ./gradlew
-
       - name: Build Release Bundle (.aab)
-        run: ./gradlew bundleRelease
+        run: gradle bundleRelease
 
       - name: Sign App Bundle
         uses: r0adkll/sign-android-release@v1
