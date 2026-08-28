@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace 'com.tajmul.gapcalculator'
-    compileSdk 35
+    compileSdk 36
     
     defaultConfig { 
         applicationId "com.tajmul.gapcalculator"
         minSdk 24
-        targetSdk 35
+        targetSdk 36
         versionCode 6
         versionName "1.6" 
     }
