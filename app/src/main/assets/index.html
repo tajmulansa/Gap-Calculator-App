@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -12,7 +12,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="application-name" content="Gap Calc">
 
-<!-- Native App Manifest -->
 <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Gap%20Calculator%22%2C%22short_name%22%3A%22Gap%20Calc%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230F0F0F%22%2C%22theme_color%22%3A%22%230F0F0F%22%7D">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,17 +36,30 @@
 
 html, body {
   background: var(--bg);
-  min-height: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
   font-family: 'Inter', sans-serif;
   color: var(--text-main);
   display: flex;
-  justify-content: center;
-  padding: 16px;
-  padding-bottom: 30px;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* MAIN SCROLLABLE APP AREA */
+.app-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .container {
@@ -56,14 +68,15 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  position: relative;
 }
 
 .header {
   margin-bottom: 2px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border);
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .header h1 {
@@ -79,17 +92,69 @@ body {
   font-size: 12px;
   color: var(--primary);
   margin-top: 4px;
+  margin-bottom: 0;
   font-weight: 500;
   letter-spacing: 0.5px;
+}
+
+/* STYLED LANGUAGE SELECTOR */
+.lang-select-wrapper {
+  position: relative;
+  color: var(--text-secondary);
+}
+
+.lang-select-wrapper:focus-within {
+  color: var(--primary);
+}
+
+.lang-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.lang-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  padding: 8px 24px 8px 30px; /* adjusted for icon */
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.lang-select:focus {
+  border-color: var(--primary);
+  background: var(--surface-active);
+}
+
+.lang-select-wrapper::after {
+  content: "▼";
+  font-size: 9px;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: inherit;
+  transition: color 0.2s;
 }
 
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .input-group { display: flex; flex-direction: column; gap: 6px; }
 
 label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
   color: var(--text-secondary);
   font-weight: 600;
 }
@@ -107,7 +172,6 @@ input {
   transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
 }
 
-/* Strict Single Active Input Highlight */
 input.active-input {
   background: var(--surface-active) !important;
   border-color: var(--primary) !important;
@@ -181,9 +245,8 @@ button.calc-btn:active { opacity: 0.9; }
 }
 
 .primary-card .card-title {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
   color: var(--text-secondary);
   font-weight: 600;
 }
@@ -207,7 +270,7 @@ button.calc-btn:active { opacity: 0.9; }
   border: 1px solid #333333;
   padding: 4px 8px;
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 12px;
   color: #dddddd;
 }
 .pill span { color: var(--text-secondary); font-weight: 500; }
@@ -228,10 +291,9 @@ button.calc-btn:active { opacity: 0.9; }
   gap: 4px;
 }
 
-.stat-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; }
+.stat-label { font-size: 10px; color: var(--text-secondary); font-weight: 600; }
 .stat-val { font-size: 14px; color: var(--text-main); font-weight: 600; }
 
-/* DIFFERENCE CARD */
 .diff-card {
   background: #141414;
   border: 1px solid #262626;
@@ -249,9 +311,8 @@ button.calc-btn:active { opacity: 0.9; }
 }
 
 .diff-title {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-secondary);
-  text-transform: uppercase;
   font-weight: 600;
 }
 
@@ -260,57 +321,48 @@ button.calc-btn:active { opacity: 0.9; }
   font-weight: 600;
 }
 
-.status-badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; display: inline-block; }
+.status-badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; display: inline-block; }
 .status-success { background: rgba(74, 222, 128, 0.1); color: var(--success); }
 .status-warn { background: rgba(250, 204, 21, 0.1); color: #FACC15; }
 
-/* DYNAMIC SCROLL SPACER */
-#kbScrollSpacer {
-  height: 0px;
-  transition: height 0.25s ease;
-  width: 100%;
-}
+.footer { margin-top: 16px; text-align: center; font-size: 11px; color: #444; font-weight: 500; padding-bottom: 10px; }
 
-/* CUSTOM VIRTUAL KEYBOARD STYLES */
-.kb-overlay {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #121212;
-  border-top: 1px solid #2e2e2e;
-  box-shadow: 0 -8px 30px rgba(0,0,0,0.9);
-  padding: 8px 10px 12px;
-  z-index: 1000;
-  transform: translateY(100%);
-  transition: transform 0.22s cubic-bezier(0.1, 0.9, 0.2, 1);
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+/* DOCKED VIRTUAL KEYBOARD */
+.kb-docked-container {
+  width: 100%;
   max-width: 440px;
   margin: 0 auto;
-  border-top-left-radius: 14px;
-  border-top-right-radius: 14px;
+  background: #121212;
+  border-top: 1px solid #2e2e2e;
+  box-shadow: 0 -8px 24px rgba(0,0,0,0.85);
+  padding: 8px 10px 10px;
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  flex-shrink: 0;
+  z-index: 100;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
 }
 
-.kb-overlay.active {
-  transform: translateY(0);
+.kb-docked-container.active {
+  display: flex;
 }
 
 .kb-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 4px;
+  padding-bottom: 3px;
   border-bottom: 1px solid #222;
 }
 
 .kb-title {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--primary);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.5px;
 }
 
 .kb-badge {
@@ -328,7 +380,6 @@ button.calc-btn:active { opacity: 0.9; }
   text-transform: uppercase;
   font-weight: 700;
   letter-spacing: 0.5px;
-  margin-top: 1px;
 }
 
 .frac-grid-7 {
@@ -355,7 +406,7 @@ button.calc-btn:active { opacity: 0.9; }
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 9px 0;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   text-align: center;
   cursor: pointer;
@@ -374,13 +425,13 @@ button.calc-btn:active { opacity: 0.9; }
   background: rgba(255, 159, 28, 0.12);
   color: var(--primary);
   border-color: rgba(255, 159, 28, 0.35);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   padding: 7px 0;
 }
 
 .kb-btn.frac-16 {
-  font-size: 11px;
+  font-size: 12px;
   padding: 7px 0;
 }
 
@@ -412,104 +463,371 @@ button.calc-btn:active { opacity: 0.9; }
 }
 
 .hidden { display: none; }
-.footer { margin-top: auto; text-align: center; font-size: 10px; color: #444; font-weight: 500; padding-bottom: 10px; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 
 <body>
-<div class="container">
-  <div class="header">
-    <h1>GAP CALCULATOR</h1>
-    <p>By Tajmul</p>
-  </div>
 
-  <!-- UNIT SYSTEM SELECTOR -->
-  <div class="input-group">
-    <label>Unit System</label>
-    <div class="segmented-control">
-      <label class="segment-label">
-        <input type="radio" name="unit" value="inch" checked onchange="toggleUnits()">
-        Inch / Null
-      </label>
-      <label class="segment-label">
-        <input type="radio" name="unit" value="mm" onchange="toggleUnits()">
-        Millimeter (MM)
-      </label>
+<!-- SCROLLABLE FORM & RESULTS AREA -->
+<div id="appScrollArea" class="app-scroll-area">
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1 data-i18n="title">GAP CALCULATOR</h1>
+        <p>By Tajmul</p>
+      </div>
+      <div class="lang-select-wrapper">
+        <span class="lang-icon">🌐</span>
+        <select id="langSelect" class="lang-select" onchange="changeLanguage()">
+          <option value="en">English</option>
+          <option value="hi">हिंदी</option>
+          <option value="bn">বাংলা</option>
+          <option value="mr">मराठी</option>
+          <option value="gu">ગુજરાતી</option>
+          <option value="or">ଓଡ଼ିଆ</option>
+          <option value="te">తెలుగు</option>
+          <option value="ta">தமிழ்</option>
+        </select>
+      </div>
     </div>
-  </div>
 
-  <div class="input-group">
-    <label id="lbl-frame">Total Span (Inside Dimension)</label>
-    <input id="frame" type="text" placeholder='e.g. 44" or 44 ¾' readonly>
-  </div>
-
-  <div class="input-group">
-    <label id="lbl-bar">Material O.D. / Width</label>
-    <input id="bar" type="text" placeholder='e.g. 4 null or 3/4"' readonly>
-  </div>
-
-  <div class="input-group" style="margin-top:4px;">
-    <label>Calculation Method</label>
-    <div class="segmented-control">
-      <label class="segment-label">
-        <input type="radio" name="mode" value="gap" checked onchange="toggleInputs()">
-        Optimize Gap
-      </label>
-      <label class="segment-label">
-        <input type="radio" name="mode" value="pipe" onchange="toggleInputs()">
-        Fixed Quantity
-      </label>
-    </div>
-  </div>
-
-  <div id="gapInputs" class="grid-2">
+    <!-- UNIT SYSTEM SELECTOR -->
     <div class="input-group">
-      <label id="lbl-gapStart">Min Gap</label>
-      <input id="gapStart" type="text" placeholder='e.g. 3"' readonly>
+      <label data-i18n="unit_sys">Unit System / माप तरीका</label>
+      <div class="segmented-control">
+        <label class="segment-label">
+          <input type="radio" name="unit" value="inch" checked onchange="toggleUnits()">
+          <span data-i18n="inch_null">Inch / Null</span>
+        </label>
+        <label class="segment-label">
+          <input type="radio" name="unit" value="mm" onchange="toggleUnits()">
+          Millimeter (MM)
+        </label>
+      </div>
     </div>
+
     <div class="input-group">
-      <label id="lbl-gapMax">Max Gap</label>
-      <input id="gapMax" type="text" placeholder='e.g. 4 ¾"' readonly>
+      <label id="lbl-frame" data-i18n="total_span">Inside Size (Total Span)</label>
+      <input id="frame" type="text" placeholder='e.g. 44" or 44 ¾' readonly>
     </div>
+
+    <div class="input-group">
+      <label id="lbl-bar" data-i18n="mat_od">Pipe / Material Size (O.D.)</label>
+      <input id="bar" type="text" placeholder='e.g. 4 null or 3/4"' readonly>
+    </div>
+
+    <div class="input-group" style="margin-top:4px;">
+      <label data-i18n="calc_method">Calculation Method</label>
+      <div class="segmented-control">
+        <label class="segment-label">
+          <input type="radio" name="mode" value="gap" checked onchange="toggleInputs()">
+          <span data-i18n="opt_gap">Auto Gap</span>
+        </label>
+        <label class="segment-label">
+          <input type="radio" name="mode" value="pipe" onchange="toggleInputs()">
+          <span data-i18n="fix_qty">Fixed Pieces</span>
+        </label>
+      </div>
+    </div>
+
+    <div id="gapInputs" class="grid-2">
+      <div class="input-group">
+        <label id="lbl-gapStart" data-i18n="min_gap">Min Gap</label>
+        <input id="gapStart" type="text" placeholder='e.g. 3"' readonly>
+      </div>
+      <div class="input-group">
+        <label id="lbl-gapMax" data-i18n="max_gap">Max Gap</label>
+        <input id="gapMax" type="text" placeholder='e.g. 4 ¾"' readonly>
+      </div>
+    </div>
+
+    <div id="pipeInputs" class="input-group hidden">
+      <label data-i18n="qty_req">How many pieces required?</label>
+      <input id="pipeCount" type="text" placeholder="10" readonly>
+    </div>
+
+    <button class="calc-btn" onclick="calculate()" data-i18n="btn_calc">Calculate</button>
+
+    <div id="outputPanel" class="result-panel">
+      <div id="outputContent"></div>
+    </div>
+
+    <div class="footer" data-i18n="footer">© Gap Calculator By Tajmul</div>
   </div>
-
-  <div id="pipeInputs" class="input-group hidden">
-    <label>Quantity Required</label>
-    <input id="pipeCount" type="text" placeholder="10" readonly>
-  </div>
-
-  <button class="calc-btn" onclick="calculate()">Calculate</button>
-
-  <div id="outputPanel" class="result-panel">
-    <div id="outputContent"></div>
-  </div>
-
-  <!-- DYNAMIC VIEWPORT SCROLL SPACER -->
-  <div id="kbScrollSpacer"></div>
-
-  <div class="footer">© Gap Calculator By Tajmul</div>
 </div>
 
-<!-- CUSTOM INCH & FRACTION KEYBOARD -->
-<div id="customKb" class="kb-overlay">
+<!-- DOCKED INCH & FRACTION KEYBOARD (RESPECTS APP LAYOUT) -->
+<div id="customKb" class="kb-docked-container">
   <div class="kb-bar">
     <span id="kbTargetTitle" class="kb-title">EDITING INPUT</span>
     <span id="kbUnitBadge" class="kb-badge">INCH MODE</span>
   </div>
   
-  <div id="kbGridContainer">
-    <!-- Dynamic Fraction and Numpad Keys render here -->
-  </div>
+  <div id="kbGridContainer"></div>
 
   <div class="kb-nav-row">
-    <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="navField(-1)">◄ Prev</button>
-    <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="navField(1)">Next ►</button>
-    <button class="kb-btn done-btn" onpointerdown="preventBlur(event)" onclick="closeKeyboard(true)">Done ✓</button>
+    <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="navField(-1)" data-i18n="prev">◄ Prev</button>
+    <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="navField(1)" data-i18n="next">Next ►</button>
+    <button class="kb-btn done-btn" onpointerdown="preventBlur(event)" onclick="closeKeyboard(true)" data-i18n="done">Done ✓</button>
   </div>
 </div>
 
 <script>
+// Translations updated with very casual, ground-level worker terminology
+const translations = {
+  en: {
+    title: "GAP CALCULATOR",
+    unit_sys: "Unit System",
+    inch_null: "Inch / Null",
+    null_pill: "Null:",
+    total_span: "Inside Size (Total Span)",
+    mat_od: "Pipe / Material Size (O.D.)",
+    calc_method: "Calculation Mode",
+    opt_gap: "Auto Gap",
+    fix_qty: "Fixed Pieces",
+    min_gap: "Min Gap",
+    max_gap: "Max Gap",
+    qty_req: "How many pieces required?",
+    btn_calc: "Calculate",
+    footer: "© Gap Calculator By Tajmul",
+    req_gap: "Final Gap Spacing",
+    mat_qty: "Total Pieces",
+    fit_status: "Fitting Status",
+    perfect_fit: "Perfect Fit",
+    approx_fit: "Approximate",
+    diff: "Difference",
+    edit_input: "EDITING INPUT",
+    eighths: "Eighths & Quarters",
+    sixteenths: "Sixteenths (16ths)",
+    prev: "◄ Prev",
+    next: "Next ►",
+    done: "Done ✓"
+  },
+  hi: {
+    title: "गैप कैलकुलेटर",
+    unit_sys: "माप तरीका (Unit)",
+    inch_null: "इंच / सूत",
+    null_pill: "सूत:",
+    total_span: "अंदर का साइज़ (Inside Size)",
+    mat_od: "पाइप / माल का साइज़ (O.D.)",
+    calc_method: "हिसाब का तरीका",
+    opt_gap: "गैप सेट करें (Auto Gap)",
+    fix_qty: "फिक्स पीस (Fixed Piece)",
+    min_gap: "कम से कम गैप",
+    max_gap: "ज़्यादा से ज़्यादा गैप",
+    qty_req: "कितने पीस (Pieces) चाहिए",
+    btn_calc: "हिसाब निकालें",
+    footer: "© गैप कैलकुलेटर By Tajmul",
+    req_gap: "फाइनल गैप (Final Gap)",
+    mat_qty: "टोटल पीस (Total Pieces)",
+    fit_status: "फिटिंग कैसी है",
+    perfect_fit: "एकदम परफेक्ट (Perfect)",
+    approx_fit: "थोड़ा आस-पास (Approx)",
+    diff: "फर्क (Difference)",
+    edit_input: "इनपुट डालें",
+    eighths: "8वें और चौथाई हिस्से",
+    sixteenths: "16वें हिस्से",
+    prev: "◄ पिछला",
+    next: "अगला ►",
+    done: "हो गया ✓"
+  },
+  bn: {
+    title: "গ্যাপ ক্যালকুলেটর",
+    unit_sys: "মাপের নিয়ম (Unit)",
+    inch_null: "ইঞ্চি / সুতা",
+    null_pill: "সুতা:",
+    total_span: "ভিতরের মাপ (Inside Size)",
+    mat_od: "পাইপ বা মালের সাইজ (O.D.)",
+    calc_method: "হিসাবের নিয়ম",
+    opt_gap: "গ্যাপ মেলাও (Auto Gap)",
+    fix_qty: "ফিক্স পিস (Fixed Piece)",
+    min_gap: "কমপক্ষে গ্যাপ",
+    max_gap: "বেশি গ্যাপ",
+    qty_req: "কয়টা পিস (Pieces) লাগবে",
+    btn_calc: "হিসাব করুন",
+    footer: "© গ্যাপ ক্যালকুলেটর By Tajmul",
+    req_gap: "ফাইনাল গ্যাপ (Final Gap)",
+    mat_qty: "মোট পিস (Total Pieces)",
+    fit_status: "ফিটিং কেমন",
+    perfect_fit: "একদম পারফেক্ট (Perfect)",
+    approx_fit: "কাছাকাছি (Approx)",
+    diff: "কম-বেশি (Difference)",
+    edit_input: "ইনপুট দিন",
+    eighths: "অষ্টম ও চতুর্থাংশ",
+    sixteenths: "ষোড়শ অংশ",
+    prev: "◄ আগেরটি",
+    next: "পরেরটি ►",
+    done: "সম্পন্ন ✓"
+  },
+  mr: {
+    title: "गॅप कॅल्क्युलेटर",
+    unit_sys: "माप पद्धत (Unit)",
+    inch_null: "इंच / सूत",
+    null_pill: "सूत:",
+    total_span: "आतील माप (Inside Size)",
+    mat_od: "पाईप / मटेरियल साईज (O.D.)",
+    calc_method: "हिशोब पद्धत",
+    opt_gap: "गॅप जुळवा (Auto Gap)",
+    fix_qty: "फिक्स पीस (Fixed Piece)",
+    min_gap: "कमीत कमी गॅप",
+    max_gap: "जास्तीत जास्त गॅप",
+    qty_req: "किती पीस (Pieces) पाहिजे",
+    btn_calc: "हिशोब काढा",
+    footer: "© गॅप कॅल्क्युलेटर By Tajmul",
+    req_gap: "फायनल गॅप (Final Gap)",
+    mat_qty: "एकूण पीस (Total Pieces)",
+    fit_status: "फिटिंग कशी आहे",
+    perfect_fit: "एकदम परफेक्ट (Perfect)",
+    approx_fit: "थोडं जवळचं (Approx)",
+    diff: "फरक (Difference)",
+    edit_input: "इनपुट टाका",
+    eighths: "8वे आणि पाव भाग",
+    sixteenths: "16वे भाग",
+    prev: "◄ मागील",
+    next: "पुढील ►",
+    done: "झाले ✓"
+  },
+  gu: {
+    title: "ગેપ કેલ્ક્યુલેટર",
+    unit_sys: "માપવાની રીત (Unit)",
+    inch_null: "ઇંચ / દોરો",
+    null_pill: "દોરો:",
+    total_span: "અંદરનું માપ (Inside Size)",
+    mat_od: "પાઇપ / મટીરીયલ સાઇઝ (O.D.)",
+    calc_method: "ગણતરીની રીત",
+    opt_gap: "ગેપ સેટ કરો (Auto Gap)",
+    fix_qty: "ફિક્સ પીસ (Fixed Piece)",
+    min_gap: "ઓછામાં ઓછો ગેપ",
+    max_gap: "વધુમાં વધુ ગેપ",
+    qty_req: "કેટલા પીસ (Pieces) જોઈએ",
+    btn_calc: "ગણતરી કરો",
+    footer: "© ગેપ કેલ્ક્યુલેટર By Tajmul",
+    req_gap: "ફાઇનલ ગેપ (Final Gap)",
+    mat_qty: "કુલ પીસ (Total Pieces)",
+    fit_status: "ફિટિંગ કેવું છે",
+    perfect_fit: "એકદમ પરફેક્ટ (Perfect)",
+    approx_fit: "થોડું આસપાસ (Approx)",
+    diff: "ફરક (Difference)",
+    edit_input: "ઇનપુટ લખો",
+    eighths: "8મા અને ચોથા ભાગ",
+    sixteenths: "16મા ભાગ",
+    prev: "◄ પાછળ",
+    next: "આગળ ►",
+    done: "થઈ ગયું ✓"
+  },
+  or: {
+    title: "ଗ୍ୟାପ୍ କାଲକୁଲେଟର",
+    unit_sys: "ମାପ ନିୟମ (Unit)",
+    inch_null: "ଇଞ୍ଚ / ସୁତା",
+    null_pill: "ସୁତା:",
+    total_span: "ଭିତର ମାପ (Inside Size)",
+    mat_od: "ପାଇପ୍ / ମାଲ୍ ସାଇଜ୍ (O.D.)",
+    calc_method: "ହିସାବ ନିୟମ",
+    opt_gap: "ଗ୍ୟାପ୍ ମିଳାନ୍ତୁ (Auto Gap)",
+    fix_qty: "ଫିକ୍ସ ପିସ୍ (Fixed Piece)",
+    min_gap: "କମ୍ ଗ୍ୟାପ୍",
+    max_gap: "ବେଶି ଗ୍ୟାପ୍",
+    qty_req: "କେତେ ପିସ୍ (Pieces) ଦରକାର",
+    btn_calc: "ହିସାବ କରନ୍ତୁ",
+    footer: "© ଗ୍ୟାପ୍ କାଲକୁଲେଟର By Tajmul",
+    req_gap: "ଫାଇନାଲ୍ ଗ୍ୟାପ୍ (Final Gap)",
+    mat_qty: "ମୋଟ ପିସ୍ (Total Pieces)",
+    fit_status: "ଫିଟିଂ କେମିତି ହେବ",
+    perfect_fit: "ପୂରା ପରଫେକ୍ଟ (Perfect)",
+    approx_fit: "ପାଖାପାଖି (Approx)",
+    diff: "ଫରକ୍ (Difference)",
+    edit_input: "ଇନପୁଟ୍ ଦିଅନ୍ତୁ",
+    eighths: "୮ମ ଏବଂ ଏକ ଚତୁର୍ଥାଂଶ",
+    sixteenths: "୧୬ଶ ଅଂଶ",
+    prev: "◄ ପୂର୍ବ",
+    next: "ପରବର୍ତ୍ତୀ ►",
+    done: "ହୋଇଗଲା ✓"
+  },
+  te: {
+    title: "గ్యాప్ కాలిక్యులేటర్",
+    unit_sys: "కొలత విధానం (Unit)",
+    inch_null: "ఇంచ్ / సూత్",
+    null_pill: "సూత్:",
+    total_span: "లోపలి కొలత (Inside Size)",
+    mat_od: "పైపు / మెటీరియల్ సైజ్ (O.D.)",
+    calc_method: "లెక్కించే పద్ధతి",
+    opt_gap: "గ్యాప్ సెట్ చేయండి (Auto Gap)",
+    fix_qty: "ఫిక్స్ పీస్ (Fixed Piece)",
+    min_gap: "తక్కువ గ్యాప్",
+    max_gap: "ఎక్కువ గ్యాప్",
+    qty_req: "ఎన్ని పీసులు (Pieces) కావాలి",
+    btn_calc: "లెక్కించండి",
+    footer: "© గ్యాప్ కాలిక్యులేటర్ By Tajmul",
+    req_gap: "ఫైనల్ గ్యాప్ (Final Gap)",
+    mat_qty: "మొత్తం పీసులు (Total Pieces)",
+    fit_status: "ఫిట్టింగ్ ఎలా ఉంది",
+    perfect_fit: "పక్కా పర్ఫెక్ట్ (Perfect)",
+    approx_fit: "దగ్గరగా ఉంది (Approx)",
+    diff: "తేడా (Difference)",
+    edit_input: "ఇన్‌పుట్‌ ఇవ్వండి",
+    eighths: "8వ మరియు పావు భాగాలు",
+    sixteenths: "16వ భాగాలు",
+    prev: "◄ మునుపటి",
+    next: "తదుపరి ►",
+    done: "పూర్తయింది ✓"
+  },
+  ta: {
+    title: "இடைவெளி கால்குலேட்டர்",
+    unit_sys: "அளவு முறை (Unit)",
+    inch_null: "இன்ச் / நூல்",
+    null_pill: "நூல்:",
+    total_span: "உள்ளே அளவு (Inside Size)",
+    mat_od: "பைப் / மெட்டீரியல் சைஸ் (O.D.)",
+    calc_method: "கணக்கிடும் முறை",
+    opt_gap: "கேப் செட் செய் (Auto Gap)",
+    fix_qty: "பிக்ஸட் பீஸ் (Fixed Piece)",
+    min_gap: "குறைந்த கேப்",
+    max_gap: "அதிக கேப்",
+    qty_req: "எத்தனை பீஸ் (Pieces) வேண்டும்",
+    btn_calc: "கணக்கிடு",
+    footer: "© இடைவெளி கால்குலேட்டர் By Tajmul",
+    req_gap: "பைனல் கேப் (Final Gap)",
+    mat_qty: "மொத்த பீஸ்கள் (Total Pieces)",
+    fit_status: "பிட்டிங் எப்படி",
+    perfect_fit: "சரியான பிட்டிங் (Perfect)",
+    approx_fit: "நெருக்கமான அளவு (Approx)",
+    diff: "வித்தியாசம் (Difference)",
+    edit_input: "உள்ளீட்டை கொடுங்கள்",
+    eighths: "எட்டாவது மற்றும் காலாண்டு",
+    sixteenths: "பதினாறாவது",
+    prev: "◄ முந்தைய",
+    next: "அடுத்த ►",
+    done: "முடிந்தது ✓"
+  }
+};
+
+let currentLang = 'en';
+
+function changeLanguage() {
+  currentLang = document.getElementById('langSelect').value;
+  
+  // Save to localStorage so it remembers the user's preference
+  localStorage.setItem('gapCalcLang', currentLang);
+  
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (translations[currentLang][key]) {
+      el.innerText = translations[currentLang][key];
+    }
+  });
+
+  // Re-run toggleUnits to update localized placeholders
+  toggleUnits();
+
+  if (activeInput) {
+    openKeyboard(activeInput); 
+  }
+  if (document.getElementById("outputPanel").classList.contains("visible")) {
+    calculate();
+  }
+}
+
 const NULL = 1/8, HALF_NULL = NULL / 2;
 const MM_TO_INCH = 1 / 25.4;
 let activeInput = null;
@@ -554,8 +872,9 @@ function parseMeasurement(input, unitMode) {
     return isNaN(mmVal) ? NaN : mmVal * MM_TO_INCH;
   }
 
-  let hasInchKeyword = s.includes('"') || s.includes('inch') || s.includes('in');
-  let hasNullKeyword = s.includes('null');
+  // Catch ALL variations of local "inch" words along with English
+  let hasInchKeyword = /(?:"|inch|in\b|इंच|ઇંચ|ইঞ্চি|ଇଞ୍ଚ|ఇంచ్|இன்ச்)/i.test(s);
+  let hasNullKeyword = /null|sut|soot|doro|सूत|દોરો|সুতা|ସୁତା|సూత్|நூல்/i.test(s);
 
   if (unitMode === 'mm' && !hasInchKeyword && !hasNullKeyword) {
     let mmVal = evalSegment(s);
@@ -566,7 +885,7 @@ function parseMeasurement(input, unitMode) {
   let parsedAny = false;
 
   if (hasInchKeyword || hasNullKeyword) {
-    let inchMatch = s.match(/(.*?)(?:"|inch|in\b)/);
+    let inchMatch = s.match(/(.*?)(?:"|inch|in\b|इंच|ઇંચ|ইঞ্চি|ଇଞ୍ଚ|ఇంచ్|இன்ச்)/i);
     if (inchMatch) {
       let inchVal = evalSegment(inchMatch[1]);
       totalInches += inchVal;
@@ -574,7 +893,7 @@ function parseMeasurement(input, unitMode) {
       s = s.replace(inchMatch[0], '');
     }
 
-    let nullMatch = s.match(/(.*?)null/);
+    let nullMatch = s.match(/(.*?)(?:null|sut|soot|doro|सूत|દોરો|সুতা|ସୁତା|సూత్|நூல்)/i);
     if (nullMatch) {
       let nullVal = evalSegment(nullMatch[1]);
       totalInches += nullVal * NULL;
@@ -589,18 +908,21 @@ function parseMeasurement(input, unitMode) {
 }
 
 function toInchNull(x) {
-  if (Math.abs(x) < 0.0001) return '0"';
+  const nullStr = { en: 'null', hi: 'सूत', mr: 'सूत', gu: 'દોરો', bn: 'সুতা', or: 'ସୁତା', te: 'సూత్', ta: 'நூல்' }[currentLang] || 'null';
+  const inchStr = { en: 'inch', hi: 'इंच', mr: 'इंच', gu: 'ઇંચ', bn: 'ইঞ্চি', or: 'ଇଞ୍ଚ', te: 'ఇంచ్', ta: 'இன்ச்' }[currentLang] || 'inch';
+  
+  if (Math.abs(x) < 0.0001) return `0 ${inchStr}`;
   let inch = Math.floor(x);
   let remNull = (x - inch) * 8;
   remNull = Math.round(remNull * 100) / 100;
   let remNullStr = Number(remNull.toFixed(2)).toString();
 
   if (inch > 0 && remNull > 0) {
-    return `${inch}" ${remNullStr} null`;
+    return `${inch} ${inchStr} ${remNullStr} ${nullStr}`;
   } else if (inch > 0) {
-    return `${inch}"`;
+    return `${inch} ${inchStr}`;
   } else {
-    return `${remNullStr} null`;
+    return `${remNullStr} ${nullStr}`;
   }
 }
 
@@ -633,7 +955,35 @@ function toMM(x) {
   return (Math.round(mm * 10) / 10) + ' mm';
 }
 
+function roundToStep(x, unitMode) {
+  let step = (unitMode === 'mm') ? (0.5 * MM_TO_INCH) : HALF_NULL;
+  let r = Math.round(x / step) * step;
+  return r < 0 ? 0 : r;
+}
+
+function solveForN(f, b, n, unitMode) {
+  if (n <= 0) return null;
+  let exactG = (f - n * b) / (n + 1);
+  if (exactG < 0) return null;
+  let g = roundToStep(exactG, unitMode);
+  let calculatedTotal = n * b + (n + 1) * g;
+  let diff = Math.abs(f - calculatedTotal);
+  return { n, g, calculatedTotal, diff, exact: diff < 0.0001 };
+}
+
 function gapPriority(f, b, gs, gm, unitMode) {
+  let maxN = Math.floor(f / b);
+  let candidates = [];
+  for (let n = maxN; n >= 1; n--) {
+    let res = solveForN(f, b, n, unitMode);
+    if (!res) continue;
+    if (res.g >= gs - 0.0001 && res.g <= gm + 0.0001) candidates.push(res);
+  }
+  if (candidates.length) {
+    let exactMatch = candidates.find(c => c.exact);
+    return exactMatch || candidates[0];
+  }
+
   let best = null, d = 1e9;
   let step = (unitMode === 'mm') ? (0.5 * MM_TO_INCH) : HALF_NULL;
 
@@ -646,16 +996,14 @@ function gapPriority(f, b, gs, gm, unitMode) {
         d = diff;
         best = { n, g, diff, calculatedTotal: u };
       }
-      if (diff < 0.0001) return { ...best, exact: true };
     }
   }
   if (best) return { ...best, exact: false };
   return null;
 }
 
-function pipePriority(f, b, n) {
-  let g = (f - n * b) / (n + 1);
-  return g < 0 ? null : { g, calculatedTotal: n * b + (n + 1) * g };
+function pipePriority(f, b, n, unitMode) {
+  return solveForN(f, b, n, unitMode);
 }
 
 function getSelectedUnit() {
@@ -668,6 +1016,8 @@ function toggleUnits() {
   const b = document.getElementById("bar");
   const gs = document.getElementById("gapStart");
   const gm = document.getElementById("gapMax");
+  const nullStr = { en: 'null', hi: 'सूत', mr: 'सूत', gu: 'દોરો', bn: 'সুতা', or: 'ସୁତା', te: 'సూత్', ta: 'நூல்' }[currentLang] || 'null';
+  const inchStr = { en: 'inch', hi: 'इंच', mr: 'इंच', gu: 'ઇંચ', bn: 'ইঞ্চি', or: 'ଇଞ୍ଚ', te: 'ఇంచ్', ta: 'இன்ச்' }[currentLang] || 'inch';
 
   if (unitMode === "mm") {
     f.placeholder = 'e.g. 1100 mm';
@@ -675,10 +1025,10 @@ function toggleUnits() {
     gs.placeholder = 'e.g. 75 mm';
     gm.placeholder = 'e.g. 100 mm';
   } else {
-    f.placeholder = 'e.g. 44" or 44 ¾';
-    b.placeholder = 'e.g. 4 null or 3/4"';
-    gs.placeholder = 'e.g. 3"';
-    gm.placeholder = 'e.g. 4 ¾"';
+    f.placeholder = `e.g. 44 ${inchStr} or 44 ¾"`;
+    b.placeholder = `e.g. 4 ${nullStr} or 3/4"`;
+    gs.placeholder = `e.g. 3 ${inchStr}`;
+    gm.placeholder = `e.g. 4 ¾"`;
   }
 
   if (activeInput) {
@@ -709,6 +1059,7 @@ function calculate() {
   const panel = document.getElementById("outputPanel");
   const content = document.getElementById("outputContent");
   const unitMode = getSelectedUnit();
+  const t = translations[currentLang];
 
   try {
     let f = parseMeasurement(document.getElementById("frame").value, unitMode);
@@ -734,49 +1085,47 @@ function calculate() {
     } else {
       let pc = parseInt(document.getElementById("pipeCount").value);
       if (isNaN(pc) || pc <= 0) throw "Invalid";
-      let pRes = pipePriority(f, b, pc);
+      
+      let pRes = pipePriority(f, b, pc, unitMode);
       if (!pRes) {
         content.innerHTML = `<div style="text-align:center; color:var(--error); padding: 8px 0;">Material quantity exceeds total span.</div>`;
         panel.classList.add("visible");
         return;
       }
-      res = { n: pc, g: pRes.g, exact: true, diff: 0, calculatedTotal: pRes.calculatedTotal };
+      res = { n: pc, g: pRes.g, exact: pRes.exact, diff: pRes.diff, calculatedTotal: pRes.calculatedTotal };
     }
 
     let primaryGapStr = unitMode === 'mm' ? toMM(res.g) : toFractionalInch(res.g);
 
     html = `
-      <!-- PRIMARY GAP HIGHLIGHT CARD -->
       <div class="primary-card">
-        <div class="card-title">Required Gap Spacing</div>
+        <div class="card-title">${t.req_gap}</div>
         <div class="main-val">${primaryGapStr}</div>
         <div class="unit-pills">
           <div class="pill"><span>Frac:</span> ${toFractionalInch(res.g)}</div>
-          <div class="pill"><span>Null:</span> ${toInchNull(res.g)}</div>
+          <div class="pill"><span>${t.null_pill}</span> ${toInchNull(res.g)}</div>
           <div class="pill"><span>MM:</span> ${toMM(res.g)}</div>
         </div>
       </div>
 
-      <!-- KEY STATS GRID -->
       <div class="result-grid">
         <div class="stat-box">
-          <div class="stat-label">Material Qty</div>
+          <div class="stat-label">${t.mat_qty}</div>
           <div class="stat-val">${res.n} Units</div>
         </div>
         <div class="stat-box">
-          <div class="stat-label">Fit Status</div>
+          <div class="stat-label">${t.fit_status}</div>
           <div>
             <span class="status-badge ${res.exact ? 'status-success' : 'status-warn'}">
-              ${res.exact ? 'Perfect Fit' : 'Nearest Approx'}
+              ${res.exact ? t.perfect_fit : t.approx_fit}
             </span>
           </div>
         </div>
       </div>
 
-      <!-- DIFFERENCE SECTION WITH FRAC, NULL & MM -->
       <div class="diff-card">
         <div class="diff-header">
-          <span class="diff-title">Difference</span>
+          <span class="diff-title">${t.diff}</span>
           <span class="diff-main-val" style="color: ${res.exact ? 'var(--text-main)' : '#FACC15'};">
             ${res.exact ? '0' : (unitMode === 'mm' ? toMM(res.diff) : toFractionalInch(res.diff))}
           </span>
@@ -784,7 +1133,7 @@ function calculate() {
         ${!res.exact ? `
           <div class="unit-pills">
             <div class="pill"><span>Frac:</span> ${toFractionalInch(res.diff)}</div>
-            <div class="pill"><span>Null:</span> ${toInchNull(res.diff)}</div>
+            <div class="pill"><span>${t.null_pill}</span> ${toInchNull(res.diff)}</div>
             <div class="pill"><span>MM:</span> ${toMM(res.diff)}</div>
           </div>
         ` : ''}
@@ -800,7 +1149,7 @@ function calculate() {
   }
 }
 
-// --- CUSTOM VIRTUAL INCH & FRACTION KEYBOARD ENGINE ---
+// --- DOCKED VIRTUAL INCH & FRACTION KEYBOARD ENGINE ---
 
 function preventBlur(e) {
   e.preventDefault();
@@ -815,7 +1164,7 @@ function setupInputs() {
 
   document.addEventListener('pointerdown', (e) => {
     const kb = document.getElementById('customKb');
-    if (!kb.contains(e.target) && !e.target.matches('input') && !e.target.matches('.segment-label')) {
+    if (!kb.contains(e.target) && !e.target.matches('input') && !e.target.matches('.segment-label') && !e.target.matches('.lang-select') && !e.target.matches('.lang-icon')) {
       closeKeyboard(false);
     }
   });
@@ -824,23 +1173,8 @@ function setupInputs() {
 function scrollToActiveInput(inputElem) {
   if (!inputElem) return;
   setTimeout(() => {
-    const kb = document.getElementById('customKb');
-    if (!kb) return;
-    
-    const kbHeight = kb.offsetHeight || 370;
-    const spacer = document.getElementById('kbScrollSpacer');
-    if (spacer) spacer.style.height = (kbHeight + 40) + 'px';
-
-    const kbTop = window.innerHeight - kbHeight;
-    const inputRect = inputElem.getBoundingClientRect();
-    const desiredInputBottom = kbTop - 18;
-    const scrollOffset = inputRect.bottom - desiredInputBottom;
-
-    window.scrollBy({
-      top: scrollOffset,
-      behavior: 'smooth'
-    });
-  }, 60);
+    inputElem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 50);
 }
 
 function openKeyboard(inputElem) {
@@ -858,7 +1192,8 @@ function openKeyboard(inputElem) {
                    inputElem.previousElementSibling || 
                    inputElem.parentElement.querySelector('label');
                    
-  const titleText = labelObj ? labelObj.innerText : "EDITING INPUT";
+  const t = translations[currentLang];
+  const titleText = labelObj ? labelObj.innerText : t.edit_input;
   
   document.getElementById('kbTargetTitle').innerText = titleText;
   document.getElementById('kbUnitBadge').innerText = unitMode === 'mm' ? 'MM MODE' : 'INCH MODE';
@@ -871,8 +1206,6 @@ function openKeyboard(inputElem) {
 
 function closeKeyboard(shouldCalculate = false) {
   document.getElementById('customKb').classList.remove('active');
-  const spacer = document.getElementById('kbScrollSpacer');
-  if (spacer) spacer.style.height = '0px';
 
   document.querySelectorAll('.container input').forEach(i => {
     i.classList.remove('active-input');
@@ -890,10 +1223,15 @@ function isFractionKey(k) {
 function renderKeyboardKeys() {
   const unitMode = getSelectedUnit();
   const container = document.getElementById('kbGridContainer');
+  const t = translations[currentLang];
+  
+  // Localized words for the explicit buttons
+  const nullStr = { en: 'null', hi: 'सूत', mr: 'सूत', gu: 'દોરો', bn: 'সুতা', or: 'ସୁତା', te: 'సూత్', ta: 'நூல்' }[currentLang] || 'null';
+  const inchStr = { en: 'inch', hi: 'इंच', mr: 'इंच', gu: 'ઇંચ', bn: 'ইঞ্চি', or: 'ଇଞ୍ଚ', te: 'ఇంచ్', ta: 'இன்ச்' }[currentLang] || 'inch';
   
   if (unitMode === 'inch') {
     container.innerHTML = `
-      <div class="kb-section-title">Eighths & Quarters (In Order)</div>
+      <div class="kb-section-title">${t.eighths}</div>
       <div class="frac-grid-7">
         <button class="kb-btn frac-btn" onpointerdown="preventBlur(event)" onclick="handleKey('⅛')">⅛</button>
         <button class="kb-btn frac-btn" onpointerdown="preventBlur(event)" onclick="handleKey('¼')">¼</button>
@@ -904,7 +1242,7 @@ function renderKeyboardKeys() {
         <button class="kb-btn frac-btn" onpointerdown="preventBlur(event)" onclick="handleKey('⅞')">⅞</button>
       </div>
 
-      <div class="kb-section-title">Sixteenths (16ths)</div>
+      <div class="kb-section-title">${t.sixteenths}</div>
       <div class="frac-grid-8">
         <button class="kb-btn frac-btn frac-16" onpointerdown="preventBlur(event)" onclick="handleKey('1/16')">1/16</button>
         <button class="kb-btn frac-btn frac-16" onpointerdown="preventBlur(event)" onclick="handleKey('3/16')">3/16</button>
@@ -920,13 +1258,13 @@ function renderKeyboardKeys() {
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('7')">7</button>
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('8')">8</button>
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('9')">9</button>
-        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('&quot;')">"</button>
+        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('${inchStr}')">${inchStr}</button>
         <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="handleKey('BACK')">⌫</button>
 
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('4')">4</button>
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('5')">5</button>
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('6')">6</button>
-        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('null')">null</button>
+        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('${nullStr}')">${nullStr}</button>
         <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="handleKey('CLEAR')">CLR</button>
 
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('1')">1</button>
@@ -937,7 +1275,7 @@ function renderKeyboardKeys() {
 
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('0')">0</button>
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('.')">.</button>
-        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('0.5')">0.5</button>
+        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('&quot;')">"</button>
         <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('mm')">mm</button>
         <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('00')">00</button>
       </div>
@@ -953,7 +1291,7 @@ function renderKeyboardKeys() {
 
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('4')">4</button>
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('5')">5</button>
-        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('6')">6</button>
+     <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('6')">6</button>
         <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('.5')">.5</button>
         <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="handleKey('CLEAR')">CLR</button>
 
@@ -967,7 +1305,7 @@ function renderKeyboardKeys() {
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('.')">.</button>
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('.25')">.25</button>
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('.75')">.75</button>
-        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('&quot;')">"</button>
+        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('${inchStr}')">${inchStr}</button>
       </div>
     `;
   }
@@ -979,6 +1317,9 @@ function handleKey(key) {
   let val = activeInput.value;
   let start = activeInput.selectionStart !== null ? activeInput.selectionStart : val.length;
   let end = activeInput.selectionEnd !== null ? activeInput.selectionEnd : val.length;
+  
+  const nullStr = { en: 'null', hi: 'सूत', mr: 'सूत', gu: 'દોરો', bn: 'সুতা', or: 'ସୁତା', te: 'సూత్', ta: 'நூல்' }[currentLang] || 'null';
+  const inchStr = { en: 'inch', hi: 'इंच', mr: 'इंच', gu: 'ઇંચ', bn: 'ইঞ্চি', or: 'ଇଞ୍ଚ', te: 'ఇంచ్', ta: 'இன்ச்' }[currentLang] || 'inch';
 
   if (key === 'BACK') {
     if (start === end) {
@@ -997,7 +1338,8 @@ function handleKey(key) {
   } else {
     let insertStr = key;
     
-    if ((key === 'null' || key === 'mm') && start > 0 && val.charAt(start - 1) !== ' ') {
+    // Automatically add space before inch, null, or mm if there's a number right before it
+    if ((key === nullStr || key === inchStr || key === 'mm') && start > 0 && val.charAt(start - 1) !== ' ') {
       insertStr = ' ' + key;
     } else if (isFractionKey(key) && start > 0 && /\d/.test(val.charAt(start - 1))) {
       insertStr = ' ' + key;
@@ -1029,6 +1371,18 @@ function navField(dir) {
 window.onload = function() {
   toggleInputs();
   setupInputs();
+  
+  // Check local storage for saved language
+  const savedLang = localStorage.getItem('gapCalcLang');
+  if (savedLang) {
+    const langSelect = document.getElementById('langSelect');
+    // Ensure the saved value actually exists in the options
+    if (Array.from(langSelect.options).some(opt => opt.value === savedLang)) {
+      langSelect.value = savedLang;
+    }
+  }
+  
+  changeLanguage(); // Initialize translations
 };
 </script>
 </body>
