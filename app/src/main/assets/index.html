@@ -275,6 +275,29 @@ button.calc-btn:active { opacity: 0.9; }
 }
 .pill span { color: var(--text-secondary); font-weight: 500; }
 
+.friendly-msg-card {
+  background: rgba(255, 159, 28, 0.1);
+  border: 1px solid rgba(255, 159, 28, 0.3);
+  border-radius: 6px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.friendly-msg-card .msg-icon {
+  font-size: 16px;
+  margin-top: 2px;
+}
+.friendly-msg-card .msg-text {
+  font-size: 13px;
+  color: #E2E2E2;
+  line-height: 1.5;
+  font-weight: 500;
+}
+.friendly-msg-card .msg-text strong {
+  color: var(--primary);
+}
+
 .result-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -498,7 +521,7 @@ button.calc-btn:active { opacity: 0.9; }
       <div class="segmented-control">
         <label class="segment-label">
           <input type="radio" name="unit" value="inch" checked onchange="toggleUnits()">
-          <span data-i18n="inch_null">Inch / Null</span>
+          <span data-i18n="inch_null">Inch</span>
         </label>
         <label class="segment-label">
           <input type="radio" name="unit" value="mm" onchange="toggleUnits()">
@@ -514,7 +537,7 @@ button.calc-btn:active { opacity: 0.9; }
 
     <div class="input-group">
       <label id="lbl-bar" data-i18n="mat_od">Pipe / Material Size (O.D.)</label>
-      <input id="bar" type="text" placeholder='e.g. 4 null or 3/4"' readonly>
+      <input id="bar" type="text" placeholder='e.g. 3/4"' readonly>
     </div>
 
     <div class="input-group" style="margin-top:4px;">
@@ -574,13 +597,13 @@ button.calc-btn:active { opacity: 0.9; }
 </div>
 
 <script>
-// Translations updated with very casual, ground-level worker terminology
+// Translations updated to handle context nicely whether it is Auto Gap or Fixed Pieces
 const translations = {
   en: {
     title: "GAP CALCULATOR",
     unit_sys: "Unit System",
-    inch_null: "Inch / Null",
-    null_pill: "Null:",
+    inch_null: "Inch",
+    null_pill: "",
     total_span: "Inside Size (Total Span)",
     mat_od: "Pipe / Material Size (O.D.)",
     calc_method: "Calculation Mode",
@@ -597,6 +620,11 @@ const translations = {
     perfect_fit: "Perfect Fit",
     approx_fit: "Approximate",
     diff: "Difference",
+    diff_more_badge: "Extra",
+    diff_less_badge: "Short",
+    msg_perfect: "You will need {n} pieces. Keep a gap of {gap} for a perfect fit!",
+    msg_manage_more: "You will need {n} pieces with a {gap} gap. You will have {diff} extra space left, manage it accordingly.",
+    msg_manage_less: "You will need {n} pieces with a {gap} gap. You will be short by {diff} space, manage it accordingly.",
     edit_input: "EDITING INPUT",
     eighths: "Eighths & Quarters",
     sixteenths: "Sixteenths (16ths)",
@@ -625,6 +653,11 @@ const translations = {
     perfect_fit: "एकदम परफेक्ट (Perfect)",
     approx_fit: "थोड़ा आस-पास (Approx)",
     diff: "फर्क (Difference)",
+    diff_more_badge: "ज़्यादा (Extra)",
+    diff_less_badge: "कम (Short)",
+    msg_perfect: "इसमें {n} पीस लगेंगे। {gap} का गैप रखें, यह एकदम परफेक्ट फिट होगा!",
+    msg_manage_more: "इसमें {n} पीस लगेंगे और {gap} का गैप रहेगा। आखिर में {diff} जगह ज़्यादा (Extra) बचेगी, उसे एडजस्ट कर लें।",
+    msg_manage_less: "इसमें {n} पीस लगेंगे और {gap} का गैप रहेगा। आखिर में {diff} जगह कम (Short) पड़ेगी, उसे एडजस्ट कर लें।",
     edit_input: "इनपुट डालें",
     eighths: "8वें और चौथाई हिस्से",
     sixteenths: "16वें हिस्से",
@@ -653,6 +686,11 @@ const translations = {
     perfect_fit: "একদম পারফেক্ট (Perfect)",
     approx_fit: "কাছাকাছি (Approx)",
     diff: "কম-বেশি (Difference)",
+    diff_more_badge: "বেশি (Extra)",
+    diff_less_badge: "কম (Short)",
+    msg_perfect: "এতে {n} টি পিস লাগবে। {gap} গ্যাপ রাখুন, একদম পারফেক্ট ফিট হবে!",
+    msg_manage_more: "এতে {n} টি পিস লাগবে এবং {gap} গ্যাপ থাকবে। শেষে {diff} জায়গা বেশি (Extra) বাঁচবে, সেটা অ্যাডজাস্ট করে নিন।",
+    msg_manage_less: "এতে {n} টি পিস লাগবে এবং {gap} গ্যাপ থাকবে। শেষে {diff} জায়গা কম (Short) পড়বে, সেটা অ্যাডজাস্ট করে নিন।",
     edit_input: "ইনপুট দিন",
     eighths: "অষ্টম ও চতুর্থাংশ",
     sixteenths: "ষোড়শ অংশ",
@@ -681,6 +719,11 @@ const translations = {
     perfect_fit: "एकदम परफेक्ट (Perfect)",
     approx_fit: "थोडं जवळचं (Approx)",
     diff: "फरक (Difference)",
+    diff_more_badge: "जास्त (Extra)",
+    diff_less_badge: "कमी (Short)",
+    msg_perfect: "यासाठी {n} पीस लागतील. {gap} गॅप ठेवा, एकदम परफेक्ट फिट बसेल!",
+    msg_manage_more: "यासाठी {n} पीस लागतील आणि {gap} गॅप राहील. शेवटी {diff} जागा जास्त (Extra) उरेल, ते ऍडजस्ट करून घ्या.",
+    msg_manage_less: "यासाठी {n} पीस लागतील आणि {gap} गॅप राहील. शेवटी {diff} जागा कमी (Short) पडेल, ते ऍडजस्ट करून घ्या.",
     edit_input: "इनपुट टाका",
     eighths: "8वे आणि पाव भाग",
     sixteenths: "16वे भाग",
@@ -709,6 +752,11 @@ const translations = {
     perfect_fit: "એકદમ પરફેક્ટ (Perfect)",
     approx_fit: "થોડું આસપાસ (Approx)",
     diff: "ફરક (Difference)",
+    diff_more_badge: "વધુ (Extra)",
+    diff_less_badge: "ઓછી (Short)",
+    msg_perfect: "આમાં {n} પીસ લાગશે. {gap} ગેપ રાખો, એકદમ પરફેક્ટ ફિટ થશે!",
+    msg_manage_more: "આમાં {n} પીસ લાગશે અને {gap} ગેપ રહેશે. છેલ્લે {diff} જગ્યા વધારે (Extra) બચશે, તેને એડજસ્ટ કરી લેજો.",
+    msg_manage_less: "આમાં {n} પીસ લાગશે અને {gap} ગેપ રહેશે. છેલ્લે {diff} જગ્યા ઓછી (Short) પડશે, તેને એડજસ્ટ કરી લેજો.",
     edit_input: "ઇનપુટ લખો",
     eighths: "8મા અને ચોથા ભાગ",
     sixteenths: "16મા ભાગ",
@@ -737,6 +785,11 @@ const translations = {
     perfect_fit: "ପୂରା ପରଫେକ୍ଟ (Perfect)",
     approx_fit: "ପାଖାପାଖି (Approx)",
     diff: "ଫରକ୍ (Difference)",
+    diff_more_badge: "ବେଶି (Extra)",
+    diff_less_badge: "କମ୍ (Short)",
+    msg_perfect: "ଏଥିରେ {n} ଟି ପିସ୍ ଲାଗିବ। {gap} ଗ୍ୟାପ୍ ରଖନ୍ତୁ, ଏକଦମ୍ ପରଫେକ୍ଟ ଫିଟ୍ ହେବ!",
+    msg_manage_more: "ଏଥିରେ {n} ଟି ପିସ୍ ଲାଗିବ ଆଉ {gap} ଗ୍ୟାପ୍ ରହିବ। ଶେଷରେ {diff} ଜାଗା ବେଶି (Extra) ବଳିବ, ତାକୁ ଆଡଜଷ୍ଟ କରିନେବେ।",
+    msg_manage_less: "ଏଥିରେ {n} ଟି ପିସ୍ ଲାଗିବ ଆଉ {gap} ଗ୍ୟାପ୍ ରହିବ। ଶେଷରେ {diff} ଜାଗା କମ୍ (Short) ପଡିବ, ତାକୁ ଆଡଜଷ୍ଟ କରିନେବେ।",
     edit_input: "ଇନପୁଟ୍ ଦିଅନ୍ତୁ",
     eighths: "୮ମ ଏବଂ ଏକ ଚତୁର୍ଥାଂଶ",
     sixteenths: "୧୬ଶ ଅଂଶ",
@@ -765,6 +818,11 @@ const translations = {
     perfect_fit: "పక్కా పర్ఫెక్ట్ (Perfect)",
     approx_fit: "దగ్గరగా ఉంది (Approx)",
     diff: "తేడా (Difference)",
+    diff_more_badge: "ఎక్కువ (Extra)",
+    diff_less_badge: "తక్కువ (Short)",
+    msg_perfect: "దీనికి {n} పీసులు పడతాయి. {gap} గ్యాప్ ఉంచండి, పర్ఫెక్ట్ గా సరిపోతుంది!",
+    msg_manage_more: "దీనికి {n} పీసులు పడతాయి మరియు {gap} గ్యాప్ ఉంటుంది. చివరగా {diff} స్థలం ఎక్కువ (Extra) మిగులుతుంది, అడ్జస్ట్ చేసుకోండి.",
+    msg_manage_less: "దీనికి {n} పీసులు పడతాయి మరియు {gap} గ్యాప్ ఉంటుంది. చివరగా {diff} స్థలం తక్కువ (Short) అవుతుంది, అడ్జస్ట్ చేసుకోండి.",
     edit_input: "ఇన్‌పుట్‌ ఇవ్వండి",
     eighths: "8వ మరియు పావు భాగాలు",
     sixteenths: "16వ భాగాలు",
@@ -793,6 +851,11 @@ const translations = {
     perfect_fit: "சரியான பிட்டிங் (Perfect)",
     approx_fit: "நெருக்கமான அளவு (Approx)",
     diff: "வித்தியாசம் (Difference)",
+    diff_more_badge: "அதிகம் (Extra)",
+    diff_less_badge: "குறைவு (Short)",
+    msg_perfect: "இதற்கு {n} பீஸ்கள் தேவைப்படும். {gap} கேப் வைக்கவும், சரியாகப் பொருந்தும்!",
+    msg_manage_more: "இதற்கு {n} பீஸ்கள் தேவைப்படும் மற்றும் {gap} கேப் இருக்கும். கடைசியாக {diff} இடம் அதிகம் (Extra) மீதமிருக்கும், அதை அட்ஜஸ்ட் செய்யவும்.",
+    msg_manage_less: "இதற்கு {n} பீஸ்கள் தேவைப்படும் மற்றும் {gap} கேப் இருக்கும். கடைசியாக {diff} இடம் குறையும் (Short), அதை அட்ஜஸ்ட் செய்யவும்.",
     edit_input: "உள்ளீட்டை கொடுங்கள்",
     eighths: "எட்டாவது மற்றும் காலாண்டு",
     sixteenths: "பதினாறாவது",
@@ -967,8 +1030,14 @@ function solveForN(f, b, n, unitMode) {
   if (exactG < 0) return null;
   let g = roundToStep(exactG, unitMode);
   let calculatedTotal = n * b + (n + 1) * g;
-  let diff = Math.abs(f - calculatedTotal);
-  return { n, g, calculatedTotal, diff, exact: diff < 0.0001 };
+  
+  // rawDiff gives us the exact +/- relation.
+  // if f > calculatedTotal, we have EXTRA space (More).
+  // if f < calculatedTotal, we have SHORT space (Less).
+  let rawDiff = f - calculatedTotal; 
+  let diff = Math.abs(rawDiff);
+  
+  return { n, g, calculatedTotal, diff, rawDiff, exact: diff < 0.0001 };
 }
 
 function gapPriority(f, b, gs, gm, unitMode) {
@@ -991,10 +1060,11 @@ function gapPriority(f, b, gs, gm, unitMode) {
     let n = Math.floor((f - g) / (b + g));
     if (n > 0) {
       let u = n * b + (n + 1) * g;
-      let diff = Math.abs(f - u);
+      let rawDiff = f - u;
+      let diff = Math.abs(rawDiff);
       if (diff < d) {
         d = diff;
-        best = { n, g, diff, calculatedTotal: u };
+        best = { n, g, diff, rawDiff, calculatedTotal: u };
       }
     }
   }
@@ -1026,7 +1096,7 @@ function toggleUnits() {
     gm.placeholder = 'e.g. 100 mm';
   } else {
     f.placeholder = `e.g. 44 ${inchStr} or 44 ¾"`;
-    b.placeholder = `e.g. 4 ${nullStr} or 3/4"`;
+    b.placeholder = currentLang === 'en' ? `e.g. 3/4"` : `e.g. 4 ${nullStr} or 3/4"`;
     gs.placeholder = `e.g. 3 ${inchStr}`;
     gm.placeholder = `e.g. 4 ¾"`;
   }
@@ -1092,10 +1162,35 @@ function calculate() {
         panel.classList.add("visible");
         return;
       }
-      res = { n: pc, g: pRes.g, exact: pRes.exact, diff: pRes.diff, calculatedTotal: pRes.calculatedTotal };
+      res = { n: pc, g: pRes.g, rawDiff: pRes.rawDiff, exact: pRes.exact, diff: pRes.diff, calculatedTotal: pRes.calculatedTotal };
     }
 
     let primaryGapStr = unitMode === 'mm' ? toMM(res.g) : toFractionalInch(res.g);
+    
+    // Contextual string generation for the conversational message 
+    // English keeps fractions, everything else uses Inch/Null strings.
+    let msgGapStr = unitMode === 'mm' ? toMM(res.g) : (currentLang === 'en' ? toFractionalInch(res.g) : toInchNull(res.g));
+    let msgDiffStr = unitMode === 'mm' ? toMM(res.diff) : (currentLang === 'en' ? toFractionalInch(res.diff) : toInchNull(res.diff));
+
+    // Create the friendly conversational message
+    let friendlyMsg = "";
+    if (res.exact) {
+      friendlyMsg = t.msg_perfect
+        .replace('{n}', `<strong>${res.n}</strong>`)
+        .replace('{gap}', `<strong>${msgGapStr}</strong>`);
+    } else {
+      let msgTemplate = res.rawDiff > 0 ? t.msg_manage_more : t.msg_manage_less;
+      friendlyMsg = msgTemplate
+        .replace('{n}', `<strong>${res.n}</strong>`)
+        .replace('{gap}', `<strong>${msgGapStr}</strong>`)
+        .replace('{diff}', `<strong>${msgDiffStr}</strong>`);
+    }
+
+    // Difference Indicator Text
+    let diffIndicator = "";
+    if (!res.exact) {
+      diffIndicator = res.rawDiff > 0 ? t.diff_more_badge : t.diff_less_badge;
+    }
 
     html = `
       <div class="primary-card">
@@ -1103,9 +1198,15 @@ function calculate() {
         <div class="main-val">${primaryGapStr}</div>
         <div class="unit-pills">
           <div class="pill"><span>Frac:</span> ${toFractionalInch(res.g)}</div>
-          <div class="pill"><span>${t.null_pill}</span> ${toInchNull(res.g)}</div>
+          ${currentLang !== 'en' ? `<div class="pill"><span>${t.null_pill}</span> ${toInchNull(res.g)}</div>` : ''}
           <div class="pill"><span>MM:</span> ${toMM(res.g)}</div>
         </div>
+      </div>
+
+      <!-- Friendly Message Card -->
+      <div class="friendly-msg-card">
+        <span class="msg-icon">💡</span>
+        <span class="msg-text">${friendlyMsg}</span>
       </div>
 
       <div class="result-grid">
@@ -1127,13 +1228,16 @@ function calculate() {
         <div class="diff-header">
           <span class="diff-title">${t.diff}</span>
           <span class="diff-main-val" style="color: ${res.exact ? 'var(--text-main)' : '#FACC15'};">
-            ${res.exact ? '0' : (unitMode === 'mm' ? toMM(res.diff) : toFractionalInch(res.diff))}
+            ${res.exact ? '0' : `
+              ${unitMode === 'mm' ? toMM(res.diff) : toFractionalInch(res.diff)} 
+              <span style="font-size:10px; opacity:0.8; font-weight:normal;">(${diffIndicator})</span>
+            `}
           </span>
         </div>
         ${!res.exact ? `
           <div class="unit-pills">
             <div class="pill"><span>Frac:</span> ${toFractionalInch(res.diff)}</div>
-            <div class="pill"><span>${t.null_pill}</span> ${toInchNull(res.diff)}</div>
+            ${currentLang !== 'en' ? `<div class="pill"><span>${t.null_pill}</span> ${toInchNull(res.diff)}</div>` : ''}
             <div class="pill"><span>MM:</span> ${toMM(res.diff)}</div>
           </div>
         ` : ''}
@@ -1264,7 +1368,7 @@ function renderKeyboardKeys() {
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('4')">4</button>
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('5')">5</button>
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('6')">6</button>
-        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('${nullStr}')">${nullStr}</button>
+        ${currentLang === 'en' ? '<div class="kb-spacer"></div>' : `<button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('${nullStr}')">${nullStr}</button>`}
         <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="handleKey('CLEAR')">CLR</button>
 
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('1')">1</button>
@@ -1291,7 +1395,7 @@ function renderKeyboardKeys() {
 
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('4')">4</button>
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('5')">5</button>
-     <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('6')">6</button>
+        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('6')">6</button>
         <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('.5')">.5</button>
         <button class="kb-btn action" onpointerdown="preventBlur(event)" onclick="handleKey('CLEAR')">CLR</button>
 
