@@ -16,7 +16,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 :root {
@@ -28,6 +28,9 @@
   --text-secondary: #A1A1A1;
   --border: #333333;
   --success: #4ADE80;
+  --warning-bg: rgba(239, 68, 68, 0.12);
+  --warning-border: #EF4444;
+  --warning-text: #FCA5A5;
   --error: #EF4444;
   --radius: 8px;
 }
@@ -39,6 +42,7 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -51,15 +55,19 @@ body {
   overflow: hidden;
 }
 
+/* FIX: Ensure hidden blocks stay hidden */
+.hidden { display: none !important; }
+
 /* MAIN SCROLLABLE APP AREA */
 .app-scroll-area {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 16px 16px 20px;
+  padding: 16px 16px 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition: padding-bottom 0.2s ease;
 }
 
 .container {
@@ -97,6 +105,28 @@ body {
   letter-spacing: 0.5px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.help-btn {
+  background: var(--surface);
+  color: var(--primary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.1s;
+}
+.help-btn:active { background: var(--surface-active); }
+
 /* STYLED LANGUAGE SELECTOR */
 .lang-select-wrapper {
   position: relative;
@@ -122,7 +152,7 @@ body {
   background: var(--surface);
   color: var(--text-main);
   border: 1px solid var(--border);
-  padding: 8px 24px 8px 30px; /* adjusted for icon */
+  padding: 8px 24px 8px 30px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
@@ -218,10 +248,11 @@ button.calc-btn {
   text-transform: uppercase;
   cursor: pointer;
   margin-top: 4px;
+  letter-spacing: 0.5px;
 }
 button.calc-btn:active { opacity: 0.9; }
 
-/* MINIMAL OUTPUT PANEL */
+/* OUTPUT RESULTS PANEL */
 .result-panel {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -233,6 +264,59 @@ button.calc-btn:active { opacity: 0.9; }
 }
 .result-panel.visible { display: flex; animation: fadeUp 0.3s ease; }
 
+/* 1. TOP CONVERSATIONAL SUMMARY MESSAGE */
+.friendly-msg-card {
+  background: rgba(255, 159, 28, 0.12);
+  border: 1px solid rgba(255, 159, 28, 0.4);
+  border-left: 4px solid var(--primary);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.friendly-msg-card .msg-icon {
+  font-size: 20px;
+  line-height: 1.2;
+}
+.friendly-msg-card .msg-text {
+  font-size: 13.5px;
+  color: #F3F3F3;
+  line-height: 1.55;
+  font-weight: 500;
+}
+.friendly-msg-card .msg-text strong {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* 2. WARNING BANNER: MARK GAPS FIRST */
+.warning-alert-card {
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  border-left: 4px solid var(--warning-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.warning-alert-card .warn-icon {
+  font-size: 18px;
+  line-height: 1.2;
+}
+.warning-alert-card .warn-body {
+  font-size: 12.5px;
+  color: var(--warning-text);
+  line-height: 1.5;
+  font-weight: 500;
+}
+.warning-alert-card .warn-body strong {
+  color: #FFFFFF;
+  font-weight: 700;
+}
+
+/* 3. MEASUREMENT CARD */
 .primary-card {
   background: #111111;
   border: 1px solid #2a2a2a;
@@ -274,29 +358,6 @@ button.calc-btn:active { opacity: 0.9; }
   color: #dddddd;
 }
 .pill span { color: var(--text-secondary); font-weight: 500; }
-
-.friendly-msg-card {
-  background: rgba(255, 159, 28, 0.1);
-  border: 1px solid rgba(255, 159, 28, 0.3);
-  border-radius: 6px;
-  padding: 12px 14px;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-}
-.friendly-msg-card .msg-icon {
-  font-size: 16px;
-  margin-top: 2px;
-}
-.friendly-msg-card .msg-text {
-  font-size: 13px;
-  color: #E2E2E2;
-  line-height: 1.5;
-  font-weight: 500;
-}
-.friendly-msg-card .msg-text strong {
-  color: var(--primary);
-}
 
 .result-grid {
   display: grid;
@@ -376,7 +437,7 @@ button.calc-btn:active { opacity: 0.9; }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 3px;
+  padding-bottom: 4px;
   border-bottom: 1px solid #222;
 }
 
@@ -485,7 +546,191 @@ button.calc-btn:active { opacity: 0.9; }
   border: none;
 }
 
-.hidden { display: none; }
+/* -------------------------------------------------------------
+   SELF-CONTAINED WALKTHROUGH MODAL (ZERO OVERLAPPING)
+   ------------------------------------------------------------- */
+.walkthrough-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.walkthrough-overlay.hidden { display: none; }
+
+.walkthrough-modal {
+  background: #161616;
+  border: 1px solid #333333;
+  border-top: 4px solid var(--primary);
+  border-radius: 18px;
+  width: 100%;
+  max-width: 410px;
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 16px 50px rgba(0,0,0,0.9);
+  animation: zoomUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wt-step-pill {
+  background: rgba(255, 159, 28, 0.15);
+  color: var(--primary);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.wt-close-btn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+.wt-close-btn:hover { color: #fff; }
+
+.wt-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wt-mockup-box {
+  background: #0D0D0D;
+  border: 1px solid #282828;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wt-mockup-label {
+  font-size: 10px;
+  color: var(--primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.wt-mockup-field {
+  background: #1D1D1D;
+  border: 1.5px solid var(--primary);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #FFF;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.wt-mockup-field .sub-note {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.wt-content {
+  font-size: 14px;
+  color: #D1D1D1;
+  line-height: 1.6;
+  font-weight: 400;
+  min-height: 85px;
+}
+.wt-content strong { color: var(--primary); font-weight: 700; }
+
+.tour-example-tag {
+  display: inline-block;
+  background: rgba(255, 159, 28, 0.2);
+  color: var(--primary);
+  border: 1px solid rgba(255, 159, 28, 0.5);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 1px 2px;
+}
+
+.wt-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid #252525;
+}
+
+.wt-dots {
+  display: flex;
+  gap: 5px;
+}
+.wt-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #3a3a3a;
+  transition: all 0.2s ease;
+}
+.wt-dot.active {
+  background: var(--primary);
+  width: 18px;
+  border-radius: 10px;
+}
+
+.wt-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.wt-btn {
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.1s;
+}
+.wt-btn:active { transform: scale(0.96); }
+
+.wt-btn-back {
+  background: #252525;
+  color: #AAA;
+}
+.wt-btn-back:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.wt-btn-next {
+  background: var(--primary);
+  color: #000;
+}
+
+@keyframes zoomUp {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 @keyframes fadeUp { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
@@ -500,18 +745,23 @@ button.calc-btn:active { opacity: 0.9; }
         <h1 data-i18n="title">GAP CALCULATOR</h1>
         <p>By Tajmul</p>
       </div>
-      <div class="lang-select-wrapper">
-        <span class="lang-icon">🌐</span>
-        <select id="langSelect" class="lang-select" onchange="changeLanguage()">
-          <option value="en">English</option>
-          <option value="hi">हिंदी</option>
-          <option value="bn">বাংলা</option>
-          <option value="mr">मराठी</option>
-          <option value="gu">ગુજરાતી</option>
-          <option value="or">ଓଡ଼ିଆ</option>
-          <option value="te">తెలుగు</option>
-          <option value="ta">தமிழ்</option>
-        </select>
+      <div class="header-actions">
+        <button class="help-btn" onclick="startWalkthrough(0)">
+          <span>❓</span> <span data-i18n="btn_help">Help</span>
+        </button>
+        <div class="lang-select-wrapper">
+          <span class="lang-icon">🌐</span>
+          <select id="langSelect" class="lang-select" onchange="changeLanguage(this.value)">
+            <option value="en">English</option>
+            <option value="hi">हिंदी</option>
+            <option value="bn">বাংলা</option>
+            <option value="mr">मराठी</option>
+            <option value="gu">ગુજરાતી</option>
+            <option value="or">ଓଡ଼ିଆ</option>
+            <option value="te">తెలుగు</option>
+            <option value="ta">தமிழ்</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -530,16 +780,19 @@ button.calc-btn:active { opacity: 0.9; }
       </div>
     </div>
 
+    <!-- Inside Size (Total Span) -->
     <div class="input-group">
       <label id="lbl-frame" data-i18n="total_span">Inside Size (Total Span)</label>
-      <input id="frame" type="text" placeholder='e.g. 44" or 44 ¾' readonly>
+      <input id="frame" type="text" placeholder='e.g. 44" or 44 ¾"' readonly>
     </div>
 
+    <!-- Pipe / Material Thickness -->
     <div class="input-group">
-      <label id="lbl-bar" data-i18n="mat_od">Pipe / Material Size (O.D.)</label>
+      <label id="lbl-bar" data-i18n="mat_od">Pipe / Material Thickness (O.D.)</label>
       <input id="bar" type="text" placeholder='e.g. 3/4"' readonly>
     </div>
 
+    <!-- Calculation Method Switcher -->
     <div class="input-group" style="margin-top:4px;">
       <label data-i18n="calc_method">Calculation Method</label>
       <div class="segmented-control">
@@ -554,24 +807,30 @@ button.calc-btn:active { opacity: 0.9; }
       </div>
     </div>
 
+    <!-- Auto Gap Inputs -->
     <div id="gapInputs" class="grid-2">
       <div class="input-group">
-        <label id="lbl-gapStart" data-i18n="min_gap">Min Gap</label>
+        <label id="lbl-gapStart" data-i18n="min_gap">Min Gap (Min)</label>
         <input id="gapStart" type="text" placeholder='e.g. 3"' readonly>
       </div>
       <div class="input-group">
-        <label id="lbl-gapMax" data-i18n="max_gap">Max Gap</label>
+        <label id="lbl-gapMax" data-i18n="max_gap">Max Gap (Max)</label>
         <input id="gapMax" type="text" placeholder='e.g. 4 ¾"' readonly>
       </div>
     </div>
 
+    <!-- Fixed Pieces Input -->
     <div id="pipeInputs" class="input-group hidden">
       <label data-i18n="qty_req">How many pieces required?</label>
       <input id="pipeCount" type="text" placeholder="10" readonly>
     </div>
 
-    <button class="calc-btn" onclick="calculate()" data-i18n="btn_calc">Calculate</button>
+    <!-- Calculate Button -->
+    <div>
+      <button class="calc-btn" onclick="calculate()" data-i18n="btn_calc">Calculate</button>
+    </div>
 
+    <!-- Results Panel -->
     <div id="outputPanel" class="result-panel">
       <div id="outputContent"></div>
     </div>
@@ -580,7 +839,7 @@ button.calc-btn:active { opacity: 0.9; }
   </div>
 </div>
 
-<!-- DOCKED INCH & FRACTION KEYBOARD (RESPECTS APP LAYOUT) -->
+<!-- DOCKED VIRTUAL INCH & FRACTION KEYBOARD -->
 <div id="customKb" class="kb-docked-container">
   <div class="kb-bar">
     <span id="kbTargetTitle" class="kb-title">EDITING INPUT</span>
@@ -596,21 +855,50 @@ button.calc-btn:active { opacity: 0.9; }
   </div>
 </div>
 
+<!-- SELF-CONTAINED WALKTHROUGH MODAL DIALOG (ZERO OVERLAPPING) -->
+<div id="wtOverlay" class="walkthrough-overlay hidden">
+  <div class="walkthrough-modal">
+    <div class="wt-header">
+      <span id="wtStepPill" class="wt-step-pill">Step 1 of 5</span>
+      <button class="wt-close-btn" onclick="closeWalkthrough()">✕ Skip</button>
+    </div>
+
+    <h2 id="wtTitle" class="wt-title">Title</h2>
+
+    <!-- Visual Mockup Container -->
+    <div id="wtMockup" class="wt-mockup-box"></div>
+
+    <!-- Friendly Explanation Text -->
+    <div id="wtContent" class="wt-content"></div>
+
+    <!-- Footer with dots & actions -->
+    <div class="wt-footer">
+      <div id="wtDots" class="wt-dots">
+        <div class="wt-dot"></div><div class="wt-dot"></div><div class="wt-dot"></div><div class="wt-dot"></div><div class="wt-dot"></div>
+      </div>
+      <div class="wt-actions">
+        <button id="wtBackBtn" class="wt-btn wt-btn-back" onclick="changeWalkthroughStep(-1)">Back</button>
+        <button id="wtNextBtn" class="wt-btn wt-btn-next" onclick="changeWalkthroughStep(1)">Next ➔</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-// Translations updated to handle context nicely whether it is Auto Gap or Fixed Pieces
 const translations = {
   en: {
     title: "GAP CALCULATOR",
+    btn_help: "Help",
     unit_sys: "Unit System",
     inch_null: "Inch",
     null_pill: "",
     total_span: "Inside Size (Total Span)",
-    mat_od: "Pipe / Material Size (O.D.)",
-    calc_method: "Calculation Mode",
+    mat_od: "Pipe / Material Thickness (O.D.)",
+    calc_method: "Calculation Method",
     opt_gap: "Auto Gap",
     fix_qty: "Fixed Pieces",
-    min_gap: "Min Gap",
-    max_gap: "Max Gap",
+    min_gap: "Min Gap (Min)",
+    max_gap: "Max Gap (Max)",
     qty_req: "How many pieces required?",
     btn_calc: "Calculate",
     footer: "© Gap Calculator By Tajmul",
@@ -625,25 +913,43 @@ const translations = {
     msg_perfect: "You will need {n} pieces. Keep a gap of {gap} for a perfect fit!",
     msg_manage_more: "You will need {n} pieces with a {gap} gap. You will have {diff} extra space left, manage it accordingly.",
     msg_manage_less: "You will need {n} pieces with a {gap} gap. You will be short by {diff} space, manage it accordingly.",
+    warning_mark_gaps: "<strong>WARNING:</strong> Always mark all gap positions on the frame with chalk/marker and double-check first before welding or fixing any piece!",
     edit_input: "EDITING INPUT",
     eighths: "Eighths & Quarters",
     sixteenths: "Sixteenths (16ths)",
     prev: "◄ Prev",
     next: "Next ►",
-    done: "Done ✓"
+    done: "Done ✓",
+    
+    // Walkthrough Steps
+    wt_lang_title: "🌐 Choose Language",
+    wt_lang_desc: "Welcome friend! Choose your preferred language so we can talk easily:",
+    
+    wt_span_title: "📏 Inside Size (Total Span)",
+    wt_span_desc: "This is your total empty space inside the frame. Tap the box and type your measurement.<br><br>👉 <strong>Example:</strong> <span class=\"tour-example-tag\">44\"</span> or <span class=\"tour-example-tag\">44 ¾\"</span>",
+    
+    wt_pipe_title: "⭕ Pipe / Material Thickness",
+    wt_pipe_desc: "Enter the outer diameter (O.D.) or thickness of your pipe or material.<br><br>👉 <strong>Example:</strong> <span class=\"tour-example-tag\">3/4\"</span> or <span class=\"tour-example-tag\">1\"</span> or <span class=\"tour-example-tag\">50 mm</span>",
+    
+    wt_autogap_title: "⚡ Auto Gap (Min & Max)",
+    wt_autogap_desc: "Don't know how many pipes fit? Auto Gap figures it out!<br><br>• <strong>Min Gap:</strong> Smallest space allowed (e.g. <span class=\"tour-example-tag\">3\"</span>).<br>• <strong>Max Gap:</strong> Largest space allowed (e.g. <span class=\"tour-example-tag\">4 ¾\"</span>).<br>The app finds the exact pipe count & perfect gap automatically!",
+    
+    wt_fixed_title: "🔢 Fixed Pieces Mode",
+    wt_fixed_desc: "Already have a fixed set of pipes? Choose <strong>Fixed Pieces</strong>, enter your count (e.g. <span class=\"tour-example-tag\">10</span>), and the app will calculate the exact gap required."
   },
   hi: {
     title: "गैप कैलकुलेटर",
+    btn_help: "मदद",
     unit_sys: "माप तरीका (Unit)",
     inch_null: "इंच / सूत",
     null_pill: "सूत:",
     total_span: "अंदर का साइज़ (Inside Size)",
-    mat_od: "पाइप / माल का साइज़ (O.D.)",
+    mat_od: "पाइप / माल की मोटाई (Thickness / O.D.)",
     calc_method: "हिसाब का तरीका",
-    opt_gap: "गैप सेट करें (Auto Gap)",
+    opt_gap: "ऑटो गैप (Auto Gap)",
     fix_qty: "फिक्स पीस (Fixed Piece)",
-    min_gap: "कम से कम गैप",
-    max_gap: "ज़्यादा से ज़्यादा गैप",
+    min_gap: "कम से कम गैप (Min)",
+    max_gap: "ज़्यादा से ज़्यादा गैप (Max)",
     qty_req: "कितने पीस (Pieces) चाहिए",
     btn_calc: "हिसाब निकालें",
     footer: "© गैप कैलकुलेटर By Tajmul",
@@ -658,25 +964,42 @@ const translations = {
     msg_perfect: "इसमें {n} पीस लगेंगे। {gap} का गैप रखें, यह एकदम परफेक्ट फिट होगा!",
     msg_manage_more: "इसमें {n} पीस लगेंगे और {gap} का गैप रहेगा। आखिर में {diff} जगह ज़्यादा (Extra) बचेगी, उसे एडजस्ट कर लें।",
     msg_manage_less: "इसमें {n} पीस लगेंगे और {gap} का गैप रहेगा। आखिर में {diff} जगह कम (Short) पड़ेगी, उसे एडजस्ट कर लें।",
+    warning_mark_gaps: "<strong>चेतावनी (Warning):</strong> वेल्डिंग या माल फिक्स करने से पहले हमेशा चॉक या पेन से सभी गैप के निशान लगाकर चेक कर लें!",
     edit_input: "इनपुट डालें",
     eighths: "8वें और चौथाई हिस्से",
     sixteenths: "16वें हिस्से",
     prev: "◄ पिछला",
     next: "अगला ►",
-    done: "हो गया ✓"
+    done: "हो गया ✓",
+    
+    wt_lang_title: "🌐 भाषा चुनें",
+    wt_lang_desc: "नमस्ते दोस्त! सबसे पहले अपनी पसंदीदा भाषा चुनें ताकि हम आसानी से समझ सकें:",
+    
+    wt_span_title: "📏 अंदर का साइज़ (Total Span)",
+    wt_span_desc: "यह आपके फ्रेम के अंदर की कुल खाली जगह है। अगर फ्रैक्शन (½, ¾) नहीं पता, तो आप कीबोर्ड से सीधा <strong>सूत</strong> भी लिख सकते हैं!<br><br>👉 <strong>उदाहरण:</strong> <span class=\"tour-example-tag\">44 इंच</span> या <span class=\"tour-example-tag\">44 इंच 4 ½ सूत</span>",
+    
+    wt_pipe_title: "⭕ पाइप / माल की मोटाई",
+    wt_pipe_desc: "अपने पाइप या माल की बाहरी मोटाई (Thickness / O.D.) डालें।<br><br>👉 <strong>उदाहरण:</strong> <span class=\"tour-example-tag\">3/4\"</span> या <span class=\"tour-example-tag\">6 सूत</span> या <span class=\"tour-example-tag\">1 इंच</span>",
+    
+    wt_autogap_title: "⚡ ऑटो गैप (Min और Max)",
+    wt_autogap_desc: "अगर पता नहीं कितने पाइप लगेंगे, तो ऑटो गैप चुनें!<br><br>• <strong>Min Gap:</strong> कम से कम कितना गैप चाहिए (जैसे <span class=\"tour-example-tag\">3 इंच</span>)।<br>• <strong>Max Gap:</strong> ज़्यादा से ज़्यादा कितना गैप चाहिए (जैसे <span class=\"tour-example-tag\">4 ¾\"</span>)।<br>ऐप खुद बताएगा कितने पाइप लगेंगे और बराबर गैप क्या रहेगा!",
+    
+    wt_fixed_title: "🔢 फिक्स पीस (Fixed Piece)",
+    wt_fixed_desc: "अगर आपको पहले से पता है कि ठीक <span class=\"tour-example-tag\">10 पीस</span> ही लगाने हैं, तो <strong>फिक्स पीस</strong> चुनें। ऐप बताएगा दोनों के बीच कितना गैप रखना है।"
   },
   bn: {
     title: "গ্যাপ ক্যালকুলেটর",
+    btn_help: "সাহায্য",
     unit_sys: "মাপের নিয়ম (Unit)",
     inch_null: "ইঞ্চি / সুতা",
     null_pill: "সুতা:",
     total_span: "ভিতরের মাপ (Inside Size)",
-    mat_od: "পাইপ বা মালের সাইজ (O.D.)",
+    mat_od: "পাইপ বা মালের পুরুত্ব (Thickness / O.D.)",
     calc_method: "হিসাবের নিয়ম",
-    opt_gap: "গ্যাপ মেলাও (Auto Gap)",
+    opt_gap: "অটো গ্যাপ (Auto Gap)",
     fix_qty: "ফিক্স পিস (Fixed Piece)",
-    min_gap: "কমপক্ষে গ্যাপ",
-    max_gap: "বেশি গ্যাপ",
+    min_gap: "কমপক্ষে গ্যাপ (Min)",
+    max_gap: "বেশি গ্যাপ (Max)",
     qty_req: "কয়টা পিস (Pieces) লাগবে",
     btn_calc: "হিসাব করুন",
     footer: "© গ্যাপ ক্যালকুলেটর By Tajmul",
@@ -691,25 +1014,42 @@ const translations = {
     msg_perfect: "এতে {n} টি পিস লাগবে। {gap} গ্যাপ রাখুন, একদম পারফেক্ট ফিট হবে!",
     msg_manage_more: "এতে {n} টি পিস লাগবে এবং {gap} গ্যাপ থাকবে। শেষে {diff} জায়গা বেশি (Extra) বাঁচবে, সেটা অ্যাডজাস্ট করে নিন।",
     msg_manage_less: "এতে {n} টি পিস লাগবে এবং {gap} গ্যাপ থাকবে। শেষে {diff} জায়গা কম (Short) পড়বে, সেটা অ্যাডজাস্ট করে নিন।",
+    warning_mark_gaps: "<strong>সতর্কতা (Warning):</strong> ওয়েল্ডিং বা মাল ফিক্স করার আগে অবশ্যই চক বা মার্কার দিয়ে সবগুলো গ্যাপের দাগ দিয়ে মিলিয়ে নিন!",
     edit_input: "ইনপুট দিন",
     eighths: "অষ্টম ও চতুর্থাংশ",
     sixteenths: "ষোড়শ অংশ",
     prev: "◄ আগেরটি",
     next: "পরেরটি ►",
-    done: "সম্পন্ন ✓"
+    done: "সম্পন্ন ✓",
+
+    wt_lang_title: "🌐 ভাষা নির্বাচন",
+    wt_lang_desc: "স্বাগতম বন্ধু! প্রথমে আপনার ভাষা বেছে নিন যাতে আমরা সহজে কথা বলতে পারি:",
+    
+    wt_span_title: "📏 ভিতরের মাপ (Total Span)",
+    wt_span_desc: "এটা আপনার ফ্রেমের ভেতরের মোট খালি জায়গা। ফ্র্যাকশন না বুঝলে সরাসরি কীবোর্ড থেকে <strong>সুতা</strong> বোতাম চেপেও লিখতে পারেন!<br><br>👉 <strong>উদাহরণ:</strong> <span class=\"tour-example-tag\">44 ইঞ্চি</span> বা <span class=\"tour-example-tag\">44 ইঞ্চি 4 ½ সুতা</span>",
+    
+    wt_pipe_title: "⭕ পাইপ বা মালের পুরুত্ব",
+    wt_pipe_desc: "আপনার পাইপ বা মালের বাইরের সাইজ ও পুরুত্ব (Thickness / O.D.) লিখুন।<br><br>👉 <strong>উদাহরণ:</strong> <span class=\"tour-example-tag\">3/4\"</span> বা <span class=\"tour-example-tag\">6 সুতা</span> বা <span class=\"tour-example-tag\">1 ইঞ্চি</span>",
+    
+    wt_autogap_title: "⚡ অটো গ্যাপ (Min ও Max)",
+    wt_autogap_desc: "কয়টি পাইপ লাগবে জানা না থাকলে অটো গ্যাপ বেছে নিন!<br><br>• <strong>Min Gap:</strong> কমপক্ষে কত গ্যাপ দরকার (যেমন <span class=\"tour-example-tag\">3 ইঞ্চি</span>)।<br>• <strong>Max Gap:</strong> সর্বোচ্চ কত গ্যাপ হতে পারে (যেমন <span class=\"tour-example-tag\">4 ¾\"</span>)।<br>অ্যাপ নিজে বলে দেবে কয়টা পাইপ লাগবে ও নিখুঁত গ্যাপ কত হবে!",
+    
+    wt_fixed_title: "🔢 ফিক্স পিস (Fixed Piece)",
+    wt_fixed_desc: "যদি আগে থেকেই জানেন যে ঠিক <span class=\"tour-example-tag\">10 টি</span> পাইপ বসাবেন, তবে <strong>ফিক্স পিস</strong> বেছে নিন। অ্যাপ সঠিক গ্যাপ বলে দেবে।"
   },
   mr: {
     title: "गॅप कॅल्क्युलेटर",
+    btn_help: "मदत",
     unit_sys: "माप पद्धत (Unit)",
     inch_null: "इंच / सूत",
     null_pill: "सूत:",
     total_span: "आतील माप (Inside Size)",
-    mat_od: "पाईप / मटेरियल साईज (O.D.)",
+    mat_od: "पाईप / मटेरियलची जाडी (Thickness / O.D.)",
     calc_method: "हिशोब पद्धत",
-    opt_gap: "गॅप जुळवा (Auto Gap)",
+    opt_gap: "ऑटो गॅप (Auto Gap)",
     fix_qty: "फिक्स पीस (Fixed Piece)",
-    min_gap: "कमीत कमी गॅप",
-    max_gap: "जास्तीत जास्त गॅप",
+    min_gap: "कमीत कमी गॅप (Min)",
+    max_gap: "जास्तीत जास्त गॅप (Max)",
     qty_req: "किती पीस (Pieces) पाहिजे",
     btn_calc: "हिशोब काढा",
     footer: "© गॅप कॅल्क्युलेटर By Tajmul",
@@ -724,25 +1064,42 @@ const translations = {
     msg_perfect: "यासाठी {n} पीस लागतील. {gap} गॅप ठेवा, एकदम परफेक्ट फिट बसेल!",
     msg_manage_more: "यासाठी {n} पीस लागतील आणि {gap} गॅप राहील. शेवटी {diff} जागा जास्त (Extra) उरेल, ते ऍडजस्ट करून घ्या.",
     msg_manage_less: "यासाठी {n} पीस लागतील आणि {gap} गॅप राहील. शेवटी {diff} जागा कमी (Short) पडेल, ते ऍडजस्ट करून घ्या.",
+    warning_mark_gaps: "<strong>चेतावणी (Warning):</strong> वेल्डिंग किंवा मटेरियल फिक्स करण्यापूर्वी खडू/मार्करने सर्व गॅपचे मार्किंग करून खात्री करा!",
     edit_input: "इनपुट टाका",
     eighths: "8वे आणि पाव भाग",
     sixteenths: "16वे भाग",
     prev: "◄ मागील",
     next: "पुढील ►",
-    done: "झाले ✓"
+    done: "झाले ✓",
+
+    wt_lang_title: "🌐 भाषा निवडा",
+    wt_lang_desc: "नमस्कार मित्रा! आधी तुमची भाषा निवडा जेणेकरून समजायला सोपे जाईल:",
+    
+    wt_span_title: "📏 आतील माप (Total Span)",
+    wt_span_desc: "फ्रेमच्या आतली एकूण रिकामी जागा. बॉक्सवर टॅप करून माप टाका. अपूर्णांक समजत नसतील तर थेट <strong>सूत</strong> वापरा!<br><br>👉 <strong>उदाहरण:</strong> <span class=\"tour-example-tag\">44 इंच</span> किंवा <span class=\"tour-example-tag\">44 इंच 4 ½ सूत</span>",
+    
+    wt_pipe_title: "⭕ पाईप / जाडी (O.D.)",
+    wt_pipe_desc: "पाईप किंवा मटेरियलची जाडी टाका.<br><br>👉 <strong>उदाहरण:</strong> <span class=\"tour-example-tag\">3/4\"</span> किंवा <span class=\"tour-example-tag\">6 सूत</span> किंवा <span class=\"tour-example-tag\">1 इंच</span>",
+    
+    wt_autogap_title: "⚡ ऑटो गॅप (Min व Max)",
+    wt_autogap_desc: "किती पाईप बसवायचे हे माहीत नसेल तर ऑटो गॅप वापरा!<br><br>• <strong>Min Gap:</strong> कमीत कमी गॅप (उदा. <span class=\"tour-example-tag\">3 इंच</span>).<br>• <strong>Max Gap:</strong> जास्तीत जास्त गॅप (उदा. <span class=\"tour-example-tag\">4 ¾\"</span>).<br>अ‍ॅप अचूक पाईप्स आणि गॅप लगेच सांगेल!",
+    
+    wt_fixed_title: "🔢 फिक्स पीस (Fixed Piece)",
+    wt_fixed_desc: "जर ठरलेले <span class=\"tour-example-tag\">10 पाईप्स</span> लावायचे असतील, तर <strong>फिक्स पीस</strong> निवडा. गॅप आपोआप निघेल."
   },
   gu: {
     title: "ગેપ કેલ્ક્યુલેટર",
+    btn_help: "મદદ",
     unit_sys: "માપવાની રીત (Unit)",
     inch_null: "ઇંચ / દોરો",
     null_pill: "દોરો:",
     total_span: "અંદરનું માપ (Inside Size)",
-    mat_od: "પાઇપ / મટીરીયલ સાઇઝ (O.D.)",
+    mat_od: "પાઇપ / મટીરીયલની જાડાઈ (Thickness / O.D.)",
     calc_method: "ગણતરીની રીત",
-    opt_gap: "ગેપ સેટ કરો (Auto Gap)",
+    opt_gap: "ઓટો ગેપ (Auto Gap)",
     fix_qty: "ફિક્સ પીસ (Fixed Piece)",
-    min_gap: "ઓછામાં ઓછો ગેપ",
-    max_gap: "વધુમાં વધુ ગેપ",
+    min_gap: "ઓછામાં ઓછો ગેપ (Min)",
+    max_gap: "વધુમાં વધુ ગેપ (Max)",
     qty_req: "કેટલા પીસ (Pieces) જોઈએ",
     btn_calc: "ગણતરી કરો",
     footer: "© ગેપ કેલ્ક્યુલેટર By Tajmul",
@@ -757,25 +1114,42 @@ const translations = {
     msg_perfect: "આમાં {n} પીસ લાગશે. {gap} ગેપ રાખો, એકદમ પરફેક્ટ ફિટ થશે!",
     msg_manage_more: "આમાં {n} પીસ લાગશે અને {gap} ગેપ રહેશે. છેલ્લે {diff} જગ્યા વધારે (Extra) બચશે, તેને એડજસ્ટ કરી લેજો.",
     msg_manage_less: "આમાં {n} પીસ લાગશે અને {gap} ગેપ રહેશે. છેલ્લે {diff} જગ્યા ઓછી (Short) પડશે, તેને એડજસ્ટ કરી લેજો.",
+    warning_mark_gaps: "<strong>ચેતવણી (Warning):</strong> વેલ્ડિંગ કે માલ ફિટ કરતા પહેલા ચોક અથવા માર્કરથી બધા ગેપના નિશાન લગાવીને ચેક કરી લો!",
     edit_input: "ઇનપુટ લખો",
     eighths: "8મા અને ચોથા ભાગ",
     sixteenths: "16મા ભાગ",
     prev: "◄ પાછળ",
     next: "આગળ ►",
-    done: "થઈ ગયું ✓"
+    done: "થઈ ગયું ✓",
+
+    wt_lang_title: "🌐 ભાષા પસંદ કરો",
+    wt_lang_desc: "નમસ્તે મિત્ર! સૌથી પહેલા તમારી ભાષા પસંદ કરો જેથી વાતચીત સરળ બને:",
+    
+    wt_span_title: "📏 અંદરનું માપ (Total Span)",
+    wt_span_desc: "ફ્રેમની અંદરની કુલ ખાલી જગ્યા. જો ફ્રેક્શન ખબર ન હોય તો તમે સીધું <strong>દોરો</strong> પણ લખી શકો છો!<br><br>👉 <strong>ઉદાહરણ:</strong> <span class=\"tour-example-tag\">44 ઇંચ</span> અથવા <span class=\"tour-example-tag\">44 ઇંચ 4 ½ દોરો</span>",
+    
+    wt_pipe_title: "⭕ પાઇપ / જાડાઈ (O.D.)",
+    wt_pipe_desc: "પાઇપ કે માલની જાડાઈ (Thickness / O.D.) નાખો.<br><br>👉 <strong>ઉદાહરણ:</strong> <span class=\"tour-example-tag\">3/4\"</span> અથવા <span class=\"tour-example-tag\">6 દોરા</span> અથવા <span class=\"tour-example-tag\">1 ઇંચ</span>",
+    
+    wt_autogap_title: "⚡ ઓટો ગેપ (Min અને Max)",
+    wt_autogap_desc: "કેટલા પાઇપ લાગશે તે ખબર ન હોય તો ઓટો ગેપ પસંદ કરો!<br><br>• <strong>Min Gap:</strong> ઓછામાં ઓછો ગેપ (જેમ કે <span class=\"tour-example-tag\">3 ઇંચ</span>).<br>• <strong>Max Gap:</strong> વધુમાં વધુ ગેપ (જેમ કે <span class=\"tour-example-tag\">4 ¾\"</span>).<br>એપ પોતે પાઇપ અને પરફેક્ટ ગેપ શોધી આપશે!",
+    
+    wt_fixed_title: "🔢 ફિક્સ પીસ (Fixed Piece)",
+    wt_fixed_desc: "જો નક્કી હોય કે <span class=\"tour-example-tag\">10 પાઇપ</span> જ લગાવવા છે, તો <strong>ફિક્સ પીસ</strong> પસંદ કરો."
   },
   or: {
     title: "ଗ୍ୟାପ୍ କାଲକୁଲେଟର",
+    btn_help: "ସାହାଯ୍ୟ",
     unit_sys: "ମାପ ନିୟମ (Unit)",
     inch_null: "ଇଞ୍ଚ / ସୁତା",
     null_pill: "ସୁତା:",
     total_span: "ଭିତର ମାପ (Inside Size)",
-    mat_od: "ପାଇପ୍ / ମାଲ୍ ସାଇଜ୍ (O.D.)",
+    mat_od: "ପାଇପ୍ ବା ମାଲ୍ ର ମୋଟେଇ (Thickness / O.D.)",
     calc_method: "ହିସାବ ନିୟମ",
-    opt_gap: "ଗ୍ୟାପ୍ ମିଳାନ୍ତୁ (Auto Gap)",
+    opt_gap: "ଅଟୋ ଗ୍ୟାପ୍ (Auto Gap)",
     fix_qty: "ଫିକ୍ସ ପିସ୍ (Fixed Piece)",
-    min_gap: "କମ୍ ଗ୍ୟାପ୍",
-    max_gap: "ବେଶି ଗ୍ୟାପ୍",
+    min_gap: "କମ୍ ଗ୍ୟାପ୍ (Min)",
+    max_gap: "ବେଶି ଗ୍ୟାପ୍ (Max)",
     qty_req: "କେତେ ପିସ୍ (Pieces) ଦରକାର",
     btn_calc: "ହିସାବ କରନ୍ତୁ",
     footer: "© ଗ୍ୟାପ୍ କାଲକୁଲେଟର By Tajmul",
@@ -790,25 +1164,42 @@ const translations = {
     msg_perfect: "ଏଥିରେ {n} ଟି ପିସ୍ ଲାଗିବ। {gap} ଗ୍ୟାପ୍ ରଖନ୍ତୁ, ଏକଦମ୍ ପରଫେକ୍ଟ ଫିଟ୍ ହେବ!",
     msg_manage_more: "ଏଥିରେ {n} ଟି ପିସ୍ ଲାଗିବ ଆଉ {gap} ଗ୍ୟାପ୍ ରହିବ। ଶେଷରେ {diff} ଜାଗା ବେଶି (Extra) ବଳିବ, ତାକୁ ଆଡଜଷ୍ଟ କରିନେବେ।",
     msg_manage_less: "ଏଥିରେ {n} ଟି ପିସ୍ ଲାଗିବ ଆଉ {gap} ଗ୍ୟାପ୍ ରହିବ। ଶେଷରେ {diff} ଜାଗା କମ୍ (Short) ପଡିବ, ତାକୁ ଆଡଜଷ୍ଟ କରିନେବେ।",
+    warning_mark_gaps: "<strong>ଚେତାବନୀ (Warning):</strong> ୱେଲ୍ଡିଂ କିମ୍ବା ମାଲ୍ ଫିକ୍ସ କରିବା ପୂର୍ବରୁ ସବୁବେଳେ ଚକ୍ କିମ୍ବା ମାର୍କର୍ ରେ ସମସ୍ତ ଗ୍ୟାପ୍ ଚିହ୍ନଟ କରି ଯାଞ୍ଚ କରନ୍ତୁ!",
     edit_input: "ଇନପୁଟ୍ ଦିଅନ୍ତୁ",
     eighths: "୮ମ ଏବଂ ଏକ ଚତୁର୍ଥାଂଶ",
     sixteenths: "୧୬ଶ ଅଂଶ",
     prev: "◄ ପୂର୍ବ",
     next: "ପରବର୍ତ୍ତୀ ►",
-    done: "ହୋଇଗଲା ✓"
+    done: "ହୋଇଗଲା ✓",
+
+    wt_lang_title: "🌐 ଭାଷା ବାଛନ୍ତୁ",
+    wt_lang_desc: "ନମସ୍କାର ସାଙ୍ଗ! ପ୍ରଥମେ ନିଜର ଭାଷା ବାଛନ୍ତୁ ଯାହାଦ୍ୱାରା ସହଜରେ ବୁଝିହେବ:",
+    
+    wt_span_title: "📏 ଭିତର ମାପ (Total Span)",
+    wt_span_desc: "ଏହା ଫ୍ରେମ୍ ଭିତରର ମୋଟ ଖାଲି ଜାଗା। ଫ୍ରାକ୍ସନ୍ ନ ଜାଣିଲେ ଆପଣ କୀବୋର୍ଡରୁ ସିଧା <strong>ସୁତା</strong> ବ୍ୟବହାର କରିପାରିବେ!<br><br>👉 <strong>ଉଦାହରଣ:</strong> <span class=\"tour-example-tag\">44 ଇଞ୍ଚ</span> କିମ୍ବା <span class=\"tour-example-tag\">44 ଇଞ୍ଚ 4 ½ ସୁତା</span>",
+    
+    wt_pipe_title: "⭕ ପାଇପ୍ / ମୋଟେଇ (O.D.)",
+    wt_pipe_desc: "ପାଇପ୍ ବା ମାଲ୍ ର ମୋଟେଇ (Thickness / O.D.) ଦିଅନ୍ତୁ।<br><br>👉 <strong>ଉଦାହରଣ:</strong> <span class=\"tour-example-tag\">3/4\"</span> କିମ୍ବା <span class=\"tour-example-tag\">6 ସୁତା</span> କିମ୍ବା <span class=\"tour-example-tag\">1 ଇଞ୍ଚ</span>",
+    
+    wt_autogap_title: "⚡ ଅଟୋ ଗ୍ୟାପ୍ (Min ଓ Max)",
+    wt_autogap_desc: "କେତୋଟି ପାଇପ୍ ଲାଗିବ ଜଣାନାହିଁ? ଅଟୋ ଗ୍ୟାପ୍ ବାଛନ୍ତୁ!<br><br>• <strong>Min Gap:</strong> କମ୍ କେତେ ଗ୍ୟାପ୍ ଦରକାର (ଯେପରି <span class=\"tour-example-tag\">3 ଇଞ୍ଚ</span>)।<br>• <strong>Max Gap:</strong> ବେଶି କେତେ ଗ୍ୟାପ୍ ହୋଇପାରିବ (ଯେପରି <span class=\"tour-example-tag\">4 ¾\"</span>)।",
+    
+    wt_fixed_title: "🔢 ଫିକ୍ସ ପିସ୍ (Fixed Piece)",
+    wt_fixed_desc: "ଯଦି ଠିକ୍ <span class=\"tour-example-tag\">10 ଟି</span> ପାଇପ୍ ଲଗାଇବାର ଅଛି, ତେବେ <strong>ଫିକ୍ସ ପିସ୍</strong> ବାଛନ୍ତୁ।"
   },
   te: {
     title: "గ్యాప్ కాలిక్యులేటర్",
+    btn_help: "సహాయం",
     unit_sys: "కొలత విధానం (Unit)",
     inch_null: "ఇంచ్ / సూత్",
     null_pill: "సూత్:",
     total_span: "లోపలి కొలత (Inside Size)",
-    mat_od: "పైపు / మెటీరియల్ సైజ్ (O.D.)",
+    mat_od: "పైపు / మెటీరియల్ మందం (Thickness / O.D.)",
     calc_method: "లెక్కించే పద్ధతి",
-    opt_gap: "గ్యాప్ సెట్ చేయండి (Auto Gap)",
+    opt_gap: "ఆటో గ్యాప్ (Auto Gap)",
     fix_qty: "ఫిక్స్ పీస్ (Fixed Piece)",
-    min_gap: "తక్కువ గ్యాప్",
-    max_gap: "ఎక్కువ గ్యాప్",
+    min_gap: "తక్కువ గ్యాప్ (Min)",
+    max_gap: "ఎక్కువ గ్యాప్ (Max)",
     qty_req: "ఎన్ని పీసులు (Pieces) కావాలి",
     btn_calc: "లెక్కించండి",
     footer: "© గ్యాప్ కాలిక్యులేటర్ By Tajmul",
@@ -823,25 +1214,42 @@ const translations = {
     msg_perfect: "దీనికి {n} పీసులు పడతాయి. {gap} గ్యాప్ ఉంచండి, పర్ఫెక్ట్ గా సరిపోతుంది!",
     msg_manage_more: "దీనికి {n} పీసులు పడతాయి మరియు {gap} గ్యాప్ ఉంటుంది. చివరగా {diff} స్థలం ఎక్కువ (Extra) మిగులుతుంది, అడ్జస్ట్ చేసుకోండి.",
     msg_manage_less: "దీనికి {n} పీసులు పడతాయి మరియు {gap} గ్యాప్ ఉంటుంది. చివరగా {diff} స్థలం తక్కువ (Short) అవుతుంది, అడ్జస్ట్ చేసుకోండి.",
+    warning_mark_gaps: "<strong>హెచ్చరిక (Warning):</strong> వెల్డింగ్ లేదా ఫిక్సింగ్ చేయడానికి ముందు సుద్ద లేదా పెన్నుతో అన్ని గ్యాప్‌లను గుర్తు పెట్టుకుని సరిచూసుకోండి!",
     edit_input: "ఇన్‌పుట్‌ ఇవ్వండి",
     eighths: "8వ మరియు పావు భాగాలు",
     sixteenths: "16వ భాగాలు",
     prev: "◄ మునుపటి",
     next: "తదుపరి ►",
-    done: "పూర్తయింది ✓"
+    done: "పూర్తయింది ✓",
+
+    wt_lang_title: "🌐 భాషను ఎంచుకోండి",
+    wt_lang_desc: "నమస్తే మిత్రమా! మొదట మీ భాషను ఎంచుకోండి:",
+    
+    wt_span_title: "📏 లోపలి కొలత (Total Span)",
+    wt_span_desc: "ఇది ఫ్రేమ్ లోపలి మొత్తం ఖాళీ స్థలం. భిన్నాలు తెలియకపోతే నేరుగా <strong>సూత్</strong> ఉపయోగించవచ్చు!<br><br>👉 <strong>ఉదాహరణ:</strong> <span class=\"tour-example-tag\">44 ఇంచ్</span> లేదా <span class=\"tour-example-tag\">44 ఇంచ్ 4 ½ సూత్</span>",
+    
+    wt_pipe_title: "⭕ పైపు / మెటీరియల్ మందం",
+    wt_pipe_desc: "పైపు లేదా మెటీరియల్ మందం (Thickness / O.D.) ఇవ్వండి.<br><br>👉 <strong>ఉదాహరణ:</strong> <span class=\"tour-example-tag\">3/4\"</span> లేదా <span class=\"tour-example-tag\">6 సూత్</span> లేదా <span class=\"tour-example-tag\">1 ఇంచ్</span>",
+    
+    wt_autogap_title: "⚡ ఆటో గ్యాప్ (Min & Max)",
+    wt_autogap_desc: "ఎన్ని పైపులు వేయాలో తెలియకపోతే ఆటో గ్యాప్ ఎంచుకోండి!<br><br>• <strong>Min Gap:</strong> కనీస గ్యాప్ (ఉదా. <span class=\"tour-example-tag\">3 ఇంచ్</span>).<br>• <strong>Max Gap:</strong> గరిష్ట గ్యాప్ (ఉదా. <span class=\"tour-example-tag\">4 ¾\"</span>).",
+    
+    wt_fixed_title: "🔢 ఫిక్స్ పీస్ (Fixed Piece)",
+    wt_fixed_desc: "మీరు కచ్చితంగా <span class=\"tour-example-tag\">10 పైపులే</span> వేయాలనుకుంటే, <strong>ఫిక్స్ పీస్</strong> ఎంచుకోండి."
   },
   ta: {
     title: "இடைவெளி கால்குலேட்டர்",
+    btn_help: "உதவி",
     unit_sys: "அளவு முறை (Unit)",
     inch_null: "இன்ச் / நூல்",
     null_pill: "நூல்:",
     total_span: "உள்ளே அளவு (Inside Size)",
-    mat_od: "பைப் / மெட்டீரியல் சைஸ் (O.D.)",
+    mat_od: "பைப் / மெட்டீரியல் தடிமன் (Thickness / O.D.)",
     calc_method: "கணக்கிடும் முறை",
-    opt_gap: "கேப் செட் செய் (Auto Gap)",
+    opt_gap: "ஆட்டோ கேப் (Auto Gap)",
     fix_qty: "பிக்ஸட் பீஸ் (Fixed Piece)",
-    min_gap: "குறைந்த கேப்",
-    max_gap: "அதிக கேப்",
+    min_gap: "குறைந்த கேப் (Min)",
+    max_gap: "அதிக கேப் (Max)",
     qty_req: "எத்தனை பீஸ் (Pieces) வேண்டும்",
     btn_calc: "கணக்கிடு",
     footer: "© இடைவெளி கால்குலேட்டர் By Tajmul",
@@ -856,32 +1264,189 @@ const translations = {
     msg_perfect: "இதற்கு {n} பீஸ்கள் தேவைப்படும். {gap} கேப் வைக்கவும், சரியாகப் பொருந்தும்!",
     msg_manage_more: "இதற்கு {n} பீஸ்கள் தேவைப்படும் மற்றும் {gap} கேப் இருக்கும். கடைசியாக {diff} இடம் அதிகம் (Extra) மீதமிருக்கும், அதை அட்ஜஸ்ட் செய்யவும்.",
     msg_manage_less: "இதற்கு {n} பீஸ்கள் தேவைப்படும் மற்றும் {gap} கேப் இருக்கும். கடைசியாக {diff} இடம் குறையும் (Short), அதை அட்ஜஸ்ட் செய்யவும்.",
+    warning_mark_gaps: "<strong>எச்சரிக்கை (Warning):</strong> வெல்டிங் அல்லது பைப் பிக்ஸ் செய்வதற்கு முன், சாக்பீஸ் அல்லது மார்க்கர் கொண்டு அனைத்து கேப்களையும் குறித்து சரிபார்க்கவும்!",
     edit_input: "உள்ளீட்டை கொடுங்கள்",
     eighths: "எட்டாவது மற்றும் காலாண்டு",
     sixteenths: "பதினாறாவது",
     prev: "◄ முந்தைய",
     next: "அடுத்த ►",
-    done: "முடிந்தது ✓"
+    done: "முடிந்தது ✓",
+
+    wt_lang_title: "🌐 மொழியைத் தேர்ந்தெடுக்கவும்",
+    wt_lang_desc: "வணக்கம் நண்பா! முதலில் உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்:",
+    
+    wt_span_title: "📏 உள்ளே அளவு (Total Span)",
+    wt_span_desc: "பிரேமின் உள்ளே உள்ள மொத்த காலி அளவு. பின்னங்கள் தெரியாவிட்டால் நேரடியாக <strong>நூல்</strong> பயன்படுத்தலாம்!<br><br>👉 <strong>உதாரணம்:</strong> <span class=\"tour-example-tag\">44 இன்ச்</span> அல்லது <span class=\"tour-example-tag\">44 இன்ச் 4 ½ நூல்</span>",
+    
+    wt_pipe_title: "⭕ பைப் / தடிமன் (O.D.)",
+    wt_pipe_desc: "பைப் அல்லது மெட்டீரியலின் தடிமன் (Thickness / O.D.) கொடுக்கவும்.<br><br>👉 <strong>உதாரணம்:</strong> <span class=\"tour-example-tag\">3/4\"</span> அல்லது <span class=\"tour-example-tag\">6 நூல்</span> அல்லது <span class=\"tour-example-tag\">1 இன்ச்</span>",
+    
+    wt_autogap_title: "⚡ ஆட்டோ கேப் (Min & Max)",
+    wt_autogap_desc: "எத்தனை பைப்புகள் தேவை என்று தெரியாவிட்டால் ஆட்டோ கேப்பைத் தேர்ந்தெடுக்கவும்!<br><br>• <strong>Min Gap:</strong> குறைந்த கேப் (உதா. <span class=\"tour-example-tag\">3 இன்ச்</span>).<br>• <strong>Max Gap:</strong> அதிக கேப் (உதா. <span class=\"tour-example-tag\">4 ¾\"</span>).",
+    
+    wt_fixed_title: "🔢 பிக்ஸட் பீஸ் (Fixed Piece)",
+    wt_fixed_desc: "சரியாக <span class=\"tour-example-tag\">10 பைப்புகள்</span> வைக்க வேண்டும் என்றால், <strong>பிக்ஸட் பீஸ்</strong> தேர்ந்தெடுக்கவும்."
   }
 };
 
 let currentLang = 'en';
 
-function changeLanguage() {
-  currentLang = document.getElementById('langSelect').value;
+function getNullStr() {
+  const map = {
+    en: 'null', hi: 'सूत', mr: 'सूत', gu: 'દોરો', bn: 'সুতা', or: 'ସୁତା', te: 'సూత్', ta: 'நூல்'
+  };
+  return map[currentLang] || 'null';
+}
+
+function getInchStr() {
+  const map = {
+    en: 'inch', hi: 'इंच', mr: 'इंच', gu: 'ઇંચ', bn: 'ইঞ্চি', or: 'ଇଞ୍ଚ', te: 'ఇంచ్', ta: 'இன்ச்'
+  };
+  return map[currentLang] || 'inch';
+}
+
+/* -------------------------------------------------------------
+   WALKTHROUGH MODAL ENGINE (ZERO OVERLAPPING)
+   ------------------------------------------------------------- */
+const walkthroughSteps = [
+  { key: 'lang' },
+  { key: 'span' },
+  { key: 'pipe' },
+  { key: 'autogap' },
+  { key: 'fixed' }
+];
+let currentWtStep = 0;
+
+function startWalkthrough(stepIdx = 0) {
+  closeKeyboard(false);
+  currentWtStep = stepIdx;
+  document.getElementById('wtOverlay').classList.remove('hidden');
+  renderWalkthroughStep();
+}
+
+function closeWalkthrough() {
+  document.getElementById('wtOverlay').classList.add('hidden');
+  localStorage.setItem('gapCalcTourDone', 'true');
+}
+
+function changeWalkthroughStep(delta) {
+  let next = currentWtStep + delta;
+  if (next < 0) return;
+  if (next >= walkthroughSteps.length) {
+    closeWalkthrough();
+    return;
+  }
+  currentWtStep = next;
+  renderWalkthroughStep();
+}
+
+function renderWalkthroughStep() {
+  const t = translations[currentLang];
+  const step = walkthroughSteps[currentWtStep];
+  const total = walkthroughSteps.length;
   
-  // Save to localStorage so it remembers the user's preference
+  document.getElementById('wtStepPill').innerText = `Step ${currentWtStep + 1} of ${total}`;
+  document.getElementById('wtBackBtn').disabled = currentWtStep === 0;
+  document.getElementById('wtNextBtn').innerText = currentWtStep === total - 1 ? "Got It! Start 🚀" : "Next ➔";
+  
+  const dots = document.querySelectorAll('.wt-dot');
+  dots.forEach((d, i) => d.classList.toggle('active', i === currentWtStep));
+  
+  const titleEl = document.getElementById('wtTitle');
+  const contentEl = document.getElementById('wtContent');
+  const mockupEl = document.getElementById('wtMockup');
+  
+  const nullStr = getNullStr();
+  const inchStr = getInchStr();
+  
+  if (step.key === 'lang') {
+    titleEl.innerHTML = t.wt_lang_title;
+    contentEl.innerHTML = t.wt_lang_desc;
+    mockupEl.innerHTML = `
+      <div class="lang-select-wrapper">
+        <span class="lang-icon" style="color:var(--primary); font-size:16px;">🌐</span>
+        <select class="lang-select" style="width: 100%; padding: 12px 14px 12px 38px; font-size: 14px; background: #202020;" onchange="changeLanguage(this.value)">
+          <option value="en" ${currentLang==='en'?'selected':''}>English</option>
+          <option value="hi" ${currentLang==='hi'?'selected':''}>हिंदी (Hindi)</option>
+          <option value="bn" ${currentLang==='bn'?'selected':''}>বাংলা (Bengali)</option>
+          <option value="mr" ${currentLang==='mr'?'selected':''}>मराठी (Marathi)</option>
+          <option value="gu" ${currentLang==='gu'?'selected':''}>ગુજરાતી (Gujarati)</option>
+          <option value="or" ${currentLang==='or'?'selected':''}>ଓଡ଼ିଆ (Odia)</option>
+          <option value="te" ${currentLang==='te'?'selected':''}>తెలుగు (Telugu)</option>
+          <option value="ta" ${currentLang==='ta'?'selected':''}>தமிழ் (Tamil)</option>
+        </select>
+      </div>
+    `;
+  } else if (step.key === 'span') {
+    titleEl.innerHTML = t.wt_span_title;
+    contentEl.innerHTML = t.wt_span_desc;
+    mockupEl.innerHTML = `
+      <div class="wt-mockup-label">${t.total_span}</div>
+      <div class="wt-mockup-field">
+        <span>44 ¾"</span>
+        <span class="sub-note">${currentLang === 'en' ? '1136.6 mm' : `44 ${inchStr} 4 ½ ${nullStr}`}</span>
+      </div>
+    `;
+  } else if (step.key === 'pipe') {
+    titleEl.innerHTML = t.wt_pipe_title;
+    contentEl.innerHTML = t.wt_pipe_desc;
+    mockupEl.innerHTML = `
+      <div class="wt-mockup-label">${t.mat_od}</div>
+      <div class="wt-mockup-field">
+        <span>3/4"</span>
+        <span class="sub-note">${currentLang === 'en' ? '19.05 mm' : `6 ${nullStr}`}</span>
+      </div>
+    `;
+  } else if (step.key === 'autogap') {
+    titleEl.innerHTML = t.wt_autogap_title;
+    contentEl.innerHTML = t.wt_autogap_desc;
+    mockupEl.innerHTML = `
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+        <div>
+          <div class="wt-mockup-label">${t.min_gap}</div>
+          <div class="wt-mockup-field" style="font-size:13px;">3"</div>
+        </div>
+        <div>
+          <div class="wt-mockup-label">${t.max_gap}</div>
+          <div class="wt-mockup-field" style="font-size:13px;">4 ¾"</div>
+        </div>
+      </div>
+    `;
+  } else if (step.key === 'fixed') {
+    titleEl.innerHTML = t.wt_fixed_title;
+    contentEl.innerHTML = t.wt_fixed_desc;
+    mockupEl.innerHTML = `
+      <div class="wt-mockup-label">${t.qty_req}</div>
+      <div class="wt-mockup-field">
+        <span>10 Pieces</span>
+        <span class="sub-note">Fixed Mode</span>
+      </div>
+    `;
+  }
+}
+
+function changeLanguage(selectedVal) {
+  if (selectedVal) {
+    currentLang = selectedVal;
+    document.getElementById('langSelect').value = selectedVal;
+  } else {
+    currentLang = document.getElementById('langSelect').value;
+  }
+  
   localStorage.setItem('gapCalcLang', currentLang);
   
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     if (translations[currentLang][key]) {
-      el.innerText = translations[currentLang][key];
+      el.innerHTML = translations[currentLang][key]; 
     }
   });
 
-  // Re-run toggleUnits to update localized placeholders
   toggleUnits();
+
+  if (!document.getElementById('wtOverlay').classList.contains('hidden')) {
+    renderWalkthroughStep();
+  }
 
   if (activeInput) {
     openKeyboard(activeInput); 
@@ -901,7 +1466,9 @@ function replaceUnicodeFractions(s) {
     '⅛': ' 1/8', '⅜': ' 3/8', '⅝': ' 5/8', '⅞': ' 7/8',
     '⅓': ' 1/3', '⅔': ' 2/3'
   };
-  return s.replace(/[½¼¾⅛⅜⅝⅞⅓⅔]/g, m => fracMap[m] || m);
+  s = s.replace(/[½¼¾⅛⅜⅝⅞⅓⅔]/g, m => fracMap[m] || m);
+  s = s.replace(/\b(half|आधा|আধা|અડધો|ଅଧା|సగం|அரை)\b/gi, ' 1/2 ');
+  return s;
 }
 
 function evalSegment(str) {
@@ -935,9 +1502,8 @@ function parseMeasurement(input, unitMode) {
     return isNaN(mmVal) ? NaN : mmVal * MM_TO_INCH;
   }
 
-  // Catch ALL variations of local "inch" words along with English
   let hasInchKeyword = /(?:"|inch|in\b|इंच|ઇંચ|ইঞ্চি|ଇଞ୍ଚ|ఇంచ్|இன்ச்)/i.test(s);
-  let hasNullKeyword = /null|sut|soot|doro|सूत|દોરો|সুতা|ସୁତା|సూత్|நூல்/i.test(s);
+  let hasNullKeyword = /null|sut|soot|doro|सूत|દોરો|દોરા|સુતા|সুতা|ସୁତା|సూత్|நூல்/i.test(s);
 
   if (unitMode === 'mm' && !hasInchKeyword && !hasNullKeyword) {
     let mmVal = evalSegment(s);
@@ -956,7 +1522,7 @@ function parseMeasurement(input, unitMode) {
       s = s.replace(inchMatch[0], '');
     }
 
-    let nullMatch = s.match(/(.*?)(?:null|sut|soot|doro|सूत|દોરો|সুতা|ସୁତା|సూత్|நூல்)/i);
+    let nullMatch = s.match(/(.*?)(?:null|sut|soot|doro|सूत|દોરો|દોરા|સુતા|সুতা|ସୁତା|సూత్|நூல்)/i);
     if (nullMatch) {
       let nullVal = evalSegment(nullMatch[1]);
       totalInches += nullVal * NULL;
@@ -971,14 +1537,21 @@ function parseMeasurement(input, unitMode) {
 }
 
 function toInchNull(x) {
-  const nullStr = { en: 'null', hi: 'सूत', mr: 'सूत', gu: 'દોરો', bn: 'সুতা', or: 'ସୁତା', te: 'సూత్', ta: 'நூல்' }[currentLang] || 'null';
-  const inchStr = { en: 'inch', hi: 'इंच', mr: 'इंच', gu: 'ઇંચ', bn: 'ইঞ্চি', or: 'ଇଞ୍ଚ', te: 'ఇంచ్', ta: 'இன்ச்' }[currentLang] || 'inch';
+  const nullStr = getNullStr();
+  const inchStr = getInchStr();
   
   if (Math.abs(x) < 0.0001) return `0 ${inchStr}`;
   let inch = Math.floor(x);
   let remNull = (x - inch) * 8;
   remNull = Math.round(remNull * 100) / 100;
+  
+  let nullInt = Math.floor(remNull);
+  let nullFrac = remNull - nullInt;
   let remNullStr = Number(remNull.toFixed(2)).toString();
+  
+  if (Math.abs(nullFrac - 0.5) < 0.01) {
+    remNullStr = nullInt > 0 ? `${nullInt} ½` : `½`;
+  }
 
   if (inch > 0 && remNull > 0) {
     return `${inch} ${inchStr} ${remNullStr} ${nullStr}`;
@@ -1031,9 +1604,6 @@ function solveForN(f, b, n, unitMode) {
   let g = roundToStep(exactG, unitMode);
   let calculatedTotal = n * b + (n + 1) * g;
   
-  // rawDiff gives us the exact +/- relation.
-  // if f > calculatedTotal, we have EXTRA space (More).
-  // if f < calculatedTotal, we have SHORT space (Less).
   let rawDiff = f - calculatedTotal; 
   let diff = Math.abs(rawDiff);
   
@@ -1086,8 +1656,8 @@ function toggleUnits() {
   const b = document.getElementById("bar");
   const gs = document.getElementById("gapStart");
   const gm = document.getElementById("gapMax");
-  const nullStr = { en: 'null', hi: 'सूत', mr: 'सूत', gu: 'દોરો', bn: 'সুতা', or: 'ସୁତା', te: 'సూత్', ta: 'நூல்' }[currentLang] || 'null';
-  const inchStr = { en: 'inch', hi: 'इंच', mr: 'इंच', gu: 'ઇંચ', bn: 'ইঞ্চি', or: 'ଇଞ୍ଚ', te: 'ఇంచ్', ta: 'இன்ச்' }[currentLang] || 'inch';
+  const nullStr = getNullStr();
+  const inchStr = getInchStr();
 
   if (unitMode === "mm") {
     f.placeholder = 'e.g. 1100 mm';
@@ -1095,11 +1665,14 @@ function toggleUnits() {
     gs.placeholder = 'e.g. 75 mm';
     gm.placeholder = 'e.g. 100 mm';
   } else {
-    f.placeholder = `e.g. 44 ${inchStr} or 44 ¾"`;
-    b.placeholder = currentLang === 'en' ? `e.g. 3/4"` : `e.g. 4 ${nullStr} or 3/4"`;
-    gs.placeholder = `e.g. 3 ${inchStr}`;
-    gm.placeholder = `e.g. 4 ¾"`;
+    f.placeholder = currentLang === 'en' ? 'e.g. 44" or 44 ¾"' : `e.g. 44 ${inchStr} or 44 ¾"`;
+    b.placeholder = currentLang === 'en' ? 'e.g. 3/4"' : `e.g. 4 ${nullStr} or 3/4"`;
+    gs.placeholder = currentLang === 'en' ? 'e.g. 3"' : `e.g. 3 ${inchStr}`;
+    gm.placeholder = 'e.g. 4 ¾"';
   }
+
+  const badge = document.getElementById('kbUnitBadge');
+  if (badge) badge.innerText = unitMode === 'mm' ? 'MM MODE' : 'INCH MODE';
 
   if (activeInput) {
     renderKeyboardKeys();
@@ -1166,13 +1739,9 @@ function calculate() {
     }
 
     let primaryGapStr = unitMode === 'mm' ? toMM(res.g) : toFractionalInch(res.g);
-    
-    // Contextual string generation for the conversational message 
-    // English keeps fractions, everything else uses Inch/Null strings.
     let msgGapStr = unitMode === 'mm' ? toMM(res.g) : (currentLang === 'en' ? toFractionalInch(res.g) : toInchNull(res.g));
     let msgDiffStr = unitMode === 'mm' ? toMM(res.diff) : (currentLang === 'en' ? toFractionalInch(res.diff) : toInchNull(res.diff));
 
-    // Create the friendly conversational message
     let friendlyMsg = "";
     if (res.exact) {
       friendlyMsg = t.msg_perfect
@@ -1186,27 +1755,33 @@ function calculate() {
         .replace('{diff}', `<strong>${msgDiffStr}</strong>`);
     }
 
-    // Difference Indicator Text
     let diffIndicator = "";
     if (!res.exact) {
       diffIndicator = res.rawDiff > 0 ? t.diff_more_badge : t.diff_less_badge;
     }
 
     html = `
+      <!-- 1. TOP CONVERSATIONAL SUMMARY MESSAGE -->
+      <div class="friendly-msg-card">
+        <span class="msg-icon">💡</span>
+        <span class="msg-text">${friendlyMsg}</span>
+      </div>
+
+      <!-- 2. HIGH PRIORITY WARNING BANNER (MARK GAPS FIRST) -->
+      <div class="warning-alert-card">
+        <span class="warn-icon">⚠️</span>
+        <div class="warn-body">${t.warning_mark_gaps}</div>
+      </div>
+
+      <!-- 3. PRIMARY MEASUREMENT CARDS -->
       <div class="primary-card">
         <div class="card-title">${t.req_gap}</div>
         <div class="main-val">${primaryGapStr}</div>
         <div class="unit-pills">
           <div class="pill"><span>Frac:</span> ${toFractionalInch(res.g)}</div>
-          ${currentLang !== 'en' ? `<div class="pill"><span>${t.null_pill}</span> ${toInchNull(res.g)}</div>` : ''}
+          ${currentLang !== 'en' ? `<div class="pill"><span>${t.null_pill}</span> ${toInchNull(res.g)}</div>` : `<div class="pill"><span>Dec:</span> ${res.g.toFixed(3)}"</div>`}
           <div class="pill"><span>MM:</span> ${toMM(res.g)}</div>
         </div>
-      </div>
-
-      <!-- Friendly Message Card -->
-      <div class="friendly-msg-card">
-        <span class="msg-icon">💡</span>
-        <span class="msg-text">${friendlyMsg}</span>
       </div>
 
       <div class="result-grid">
@@ -1246,6 +1821,10 @@ function calculate() {
 
     content.innerHTML = html;
     panel.classList.add("visible");
+    
+    setTimeout(() => {
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
 
   } catch(e) {
     content.innerHTML = `<div style="text-align:center; color:var(--error); padding: 8px 0;">⚠ Please check input measurements</div>`;
@@ -1262,23 +1841,24 @@ function preventBlur(e) {
 function setupInputs() {
   const inputs = document.querySelectorAll('.container input[type="text"], .container input[type="number"]');
   inputs.forEach(input => {
-    input.addEventListener('pointerdown', () => openKeyboard(input));
-    input.addEventListener('click', () => openKeyboard(input));
+    input.addEventListener('pointerdown', (e) => {
+      if(!document.getElementById('wtOverlay').classList.contains('hidden')) return;
+      openKeyboard(input);
+    });
+    input.addEventListener('click', (e) => {
+      if(!document.getElementById('wtOverlay').classList.contains('hidden')) return;
+      openKeyboard(input);
+    });
   });
 
   document.addEventListener('pointerdown', (e) => {
     const kb = document.getElementById('customKb');
-    if (!kb.contains(e.target) && !e.target.matches('input') && !e.target.matches('.segment-label') && !e.target.matches('.lang-select') && !e.target.matches('.lang-icon')) {
+    if(!document.getElementById('wtOverlay').classList.contains('hidden')) return;
+
+    if (!kb.contains(e.target) && !e.target.matches('input') && !e.target.matches('.segment-label') && !e.target.matches('.lang-select') && !e.target.matches('.lang-icon') && !e.target.matches('.help-btn')) {
       closeKeyboard(false);
     }
   });
-}
-
-function scrollToActiveInput(inputElem) {
-  if (!inputElem) return;
-  setTimeout(() => {
-    inputElem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, 50);
 }
 
 function openKeyboard(inputElem) {
@@ -1305,11 +1885,17 @@ function openKeyboard(inputElem) {
   renderKeyboardKeys();
   document.getElementById('customKb').classList.add('active');
 
-  scrollToActiveInput(inputElem);
+  // Prevent keyboard from covering active input
+  document.getElementById('appScrollArea').style.paddingBottom = '340px';
+
+  setTimeout(() => {
+    inputElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 50);
 }
 
 function closeKeyboard(shouldCalculate = false) {
   document.getElementById('customKb').classList.remove('active');
+  document.getElementById('appScrollArea').style.paddingBottom = '40px';
 
   document.querySelectorAll('.container input').forEach(i => {
     i.classList.remove('active-input');
@@ -1329,9 +1915,8 @@ function renderKeyboardKeys() {
   const container = document.getElementById('kbGridContainer');
   const t = translations[currentLang];
   
-  // Localized words for the explicit buttons
-  const nullStr = { en: 'null', hi: 'सूत', mr: 'सूत', gu: 'દોરો', bn: 'সুতা', or: 'ସୁତା', te: 'సూత్', ta: 'நூல்' }[currentLang] || 'null';
-  const inchStr = { en: 'inch', hi: 'इंच', mr: 'इंच', gu: 'ઇંચ', bn: 'ইঞ্চি', or: 'ଇଞ୍ଚ', te: 'ఇంచ్', ta: 'இன்ச்' }[currentLang] || 'inch';
+  const nullStr = getNullStr();
+  const inchStr = getInchStr();
   
   if (unitMode === 'inch') {
     container.innerHTML = `
@@ -1379,7 +1964,9 @@ function renderKeyboardKeys() {
 
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('0')">0</button>
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('.')">.</button>
-        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('&quot;')">"</button>
+        ${currentLang === 'en' 
+          ? `<button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('&quot;')">"</button>` 
+          : `<button class="kb-btn frac-btn" style="font-size:16px;" onpointerdown="preventBlur(event)" onclick="handleKey('½')">½</button>`}
         <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('mm')">mm</button>
         <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('00')">00</button>
       </div>
@@ -1407,8 +1994,8 @@ function renderKeyboardKeys() {
 
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('0')">0</button>
         <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('.')">.</button>
-        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('.25')">.25</button>
-        <button class="kb-btn" onpointerdown="preventBlur(event)" onclick="handleKey('.75')">.75</button>
+        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('.25')">.25</button>
+        <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('.75')">.75</button>
         <button class="kb-btn accent" onpointerdown="preventBlur(event)" onclick="handleKey('${inchStr}')">${inchStr}</button>
       </div>
     `;
@@ -1422,8 +2009,8 @@ function handleKey(key) {
   let start = activeInput.selectionStart !== null ? activeInput.selectionStart : val.length;
   let end = activeInput.selectionEnd !== null ? activeInput.selectionEnd : val.length;
   
-  const nullStr = { en: 'null', hi: 'सूत', mr: 'सूत', gu: 'દોરો', bn: 'সুতা', or: 'ସୁତା', te: 'సూత్', ta: 'நூல்' }[currentLang] || 'null';
-  const inchStr = { en: 'inch', hi: 'इंच', mr: 'इंच', gu: 'ઇંચ', bn: 'ইঞ্চি', or: 'ଇଞ୍ଚ', te: 'ఇంచ్', ta: 'இன்ச்' }[currentLang] || 'inch';
+  const nullStr = getNullStr();
+  const inchStr = getInchStr();
 
   if (key === 'BACK') {
     if (start === end) {
@@ -1442,7 +2029,7 @@ function handleKey(key) {
   } else {
     let insertStr = key;
     
-    // Automatically add space before inch, null, or mm if there's a number right before it
+    // Automatically add space before inch, null, or mm if preceded by non-space
     if ((key === nullStr || key === inchStr || key === 'mm') && start > 0 && val.charAt(start - 1) !== ' ') {
       insertStr = ' ' + key;
     } else if (isFractionKey(key) && start > 0 && /\d/.test(val.charAt(start - 1))) {
@@ -1476,17 +2063,19 @@ window.onload = function() {
   toggleInputs();
   setupInputs();
   
-  // Check local storage for saved language
   const savedLang = localStorage.getItem('gapCalcLang');
   if (savedLang) {
     const langSelect = document.getElementById('langSelect');
-    // Ensure the saved value actually exists in the options
     if (Array.from(langSelect.options).some(opt => opt.value === savedLang)) {
       langSelect.value = savedLang;
     }
   }
-  
-  changeLanguage(); // Initialize translations
+
+  changeLanguage();
+
+  if (!localStorage.getItem('gapCalcTourDone')) {
+    startWalkthrough(0);
+  }
 };
 </script>
 </body>
