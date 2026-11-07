@@ -1,10 +1,13 @@
 package com.tajmul.gapcalculator;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.IntentSender;
+import android.net.Uri;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -19,15 +22,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.snackbar.Snackbar;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 // AdMob Imports
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
-import com.google.android.gms.ads.FullScreenContentCallback;
+
+// User Messaging Platform (GDPR / EEA+UK consent)
+import com.google.android.ump.ConsentInformation;
+import com.google.android.ump.ConsentRequestParameters;
+import com.google.android.ump.UserMessagingPlatform;
 
 // In-App Update Imports
 import com.google.android.play.core.appupdate.AppUpdateManager;
@@ -41,7 +46,10 @@ import com.google.android.play.core.install.model.UpdateAvailability;
 public class MainActivity extends AppCompatActivity {
 
     private AdView adView;
-    private InterstitialAd mInterstitialAd;
+    private ConsentInformation consentInformation;
+    private final AtomicBoolean adsInitialized = new AtomicBoolean(false);
+    private static final String PRIVACY_POLICY_URL =
+        "https://confusion-spectrum-9e9.notion.site/Gap-Calculator-Privacy-Policy-3c98f17452368055824cf062db43df2f";
     private AppUpdateManager appUpdateManager;
     private View rootView;
 
@@ -75,27 +83,26 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Start Ads in the background
-        new Thread(() -> {
-            MobileAds.initialize(this, initializationStatus -> {});
-            runOnUiThread(() -> {
-                // 1. Load the Banner Ad at the bottom
-                adView = findViewById(R.id.adView);
-                if (adView != null) {
-                    adView.loadAd(new AdRequest.Builder().build());
-                }
+        // Privacy links shown at the bottom of the app
+        TextView privacyPolicyLink = findViewById(R.id.privacyPolicyLink);
+        privacyPolicyLink.setOnClickListener(v ->
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(PRIVACY_POLICY_URL))));
+        TextView privacySettingsLink = findViewById(R.id.privacySettingsLink);
+        privacySettingsLink.setOnClickListener(v ->
+            UserMessagingPlatform.showPrivacyOptionsForm(this, formError -> {
+                if (consentInformation.canRequestAds()) initializeAdsOnce();
+            }));
 
-                // 2. Load the Full-Screen Interstitial Ad
-                loadFullScreenAd();
-            });
-        }).start();
+        // Ask for consent (EEA/UK/CH) BEFORE any ad is requested
+        setUpConsentThenAds(privacySettingsLink);
 
         // Setup the Calculator Web Interface
         WebView webView = findViewById(R.id.webView);
         WebSettings ws = webView.getSettings();
         ws.setJavaScriptEnabled(true);
         ws.setDomStorageEnabled(true);
-        ws.setAllowFileAccess(true);
+        ws.setAllowFileAccess(false);      // bundled assets still load via file:///android_asset
+        ws.setAllowContentAccess(false);
         webView.setWebViewClient(new WebViewClient());
         webView.loadUrl("file:///android_asset/index.html");
 
@@ -132,34 +139,42 @@ public class MainActivity extends AppCompatActivity {
         snackbar.show();
     }
 
-    private void loadFullScreenAd() {
-        AdRequest adRequest = new AdRequest.Builder().build();
+    private void setUpConsentThenAds(TextView privacySettingsLink) {
+        consentInformation = UserMessagingPlatform.getConsentInformation(this);
+        ConsentRequestParameters params = new ConsentRequestParameters.Builder().build();
 
-        // This is your LIVE AdMob Interstitial ID
-        InterstitialAd.load(this, "ca-app-pub-4812493783151469/2570826540", adRequest,
-            new InterstitialAdLoadCallback() {
-                @Override
-                public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                    mInterstitialAd = interstitialAd;
+        consentInformation.requestConsentInfoUpdate(this, params,
+            () -> UserMessagingPlatform.loadAndShowConsentFormIfRequired(this, formError -> {
+                updatePrivacySettingsLink(privacySettingsLink);
+                if (consentInformation.canRequestAds()) initializeAdsOnce();
+            }),
+            requestError -> {
+                // Could not reach the consent service: only load ads if consent was already obtained earlier
+                updatePrivacySettingsLink(privacySettingsLink);
+                if (consentInformation.canRequestAds()) initializeAdsOnce();
+            });
 
-                    // Show the ad instantly as soon as it is ready
-                    mInterstitialAd.show(MainActivity.this);
+        // Returning users who already gave consent can load ads right away
+        if (consentInformation.canRequestAds()) initializeAdsOnce();
+    }
 
-                    mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback(){
-                        @Override
-                        public void onAdDismissedFullScreenContent() {
-                            // This runs when the user hits the "X" to close the ad
-                            mInterstitialAd = null;
-                        }
-                    });
-                }
+    private void updatePrivacySettingsLink(TextView link) {
+        boolean required = consentInformation.getPrivacyOptionsRequirementStatus()
+            == ConsentInformation.PrivacyOptionsRequirementStatus.REQUIRED;
+        link.setVisibility(required ? View.VISIBLE : View.GONE);
+    }
 
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    // If ad fails to load (e.g., no internet), it just skips quietly
-                    mInterstitialAd = null;
+    private void initializeAdsOnce() {
+        if (!adsInitialized.compareAndSet(false, true)) return;
+        new Thread(() -> {
+            MobileAds.initialize(this, initializationStatus -> {});
+            runOnUiThread(() -> {
+                adView = findViewById(R.id.adView);
+                if (adView != null) {
+                    adView.loadAd(new AdRequest.Builder().build());
                 }
             });
+        }).start();
     }
 
     @Override 
