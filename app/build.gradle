@@ -11,12 +11,16 @@ android {
         applicationId "com.tajmul.gapcalculator"
         minSdk 24
         targetSdk 36
-        versionCode 12
-        versionName "2.2" 
+        versionCode 13
+        versionName "2.3" 
     }
     
     buildTypes { 
-        release { minifyEnabled false }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
         debug { minifyEnabled false } 
     }
     
