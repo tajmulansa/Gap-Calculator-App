@@ -10,7 +10,42 @@
         android:id="@+id/webView" 
         android:layout_width="match_parent" 
         android:layout_height="match_parent" 
-        android:layout_above="@id/adView" />
+        android:layout_above="@id/privacyBar" />
+
+    <LinearLayout
+        android:id="@+id/privacyBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/adView"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:background="#0F0F0F">
+
+        <TextView
+            android:id="@+id/privacyPolicyLink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:gravity="center"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="Privacy Policy"
+            android:textColor="#9A9A9A"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/privacySettingsLink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:gravity="center"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="Privacy settings"
+            android:textColor="#9A9A9A"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </LinearLayout>
         
     <com.google.android.gms.ads.AdView 
         android:id="@+id/adView" 
