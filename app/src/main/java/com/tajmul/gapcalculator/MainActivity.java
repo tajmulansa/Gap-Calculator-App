@@ -2,11 +2,14 @@ package com.tajmul.gapcalculator;
 
 import android.annotation.SuppressLint;
 import android.content.IntentSender;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import androidx.activity.EdgeToEdge;
+import androidx.activity.SystemBarStyle;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -57,11 +60,14 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Edge-to-edge on every Android version (dark bars -> light icons, app bg is dark)
+        EdgeToEdge.enable(this,
+            SystemBarStyle.dark(Color.TRANSPARENT),
+            SystemBarStyle.dark(Color.TRANSPARENT));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Push content below the status bar and above the nav bar
-        // (Android 15 / targetSdk 35+ draws edge-to-edge by default)
+        // Keep content clear of the status bar and nav bar
         rootView = findViewById(R.id.main);
         ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
