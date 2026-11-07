@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private ConsentInformation consentInformation;
     private final AtomicBoolean adsInitialized = new AtomicBoolean(false);
     private static final String PRIVACY_POLICY_URL =
-        "https://tajmulansa.github.io/Gap-Calculator-App/privacy.html";
+        "https://confusion-spectrum-9e9.notion.site/Gap-Calculator-Privacy-Policy-3c98f17452368055824cf062db43df2f";
     private AppUpdateManager appUpdateManager;
     private View rootView;
 
